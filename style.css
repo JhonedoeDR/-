@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+
+:root {
+  --paper: #faf8f3;
+  --paper-line: #e4ddcd;
+  --ink: #1f2a3d;
+  --ink-soft: #5a6478;
+  --amber: #c6883a;
+  --amber-soft: #f1e0c3;
+  --green: #5c7a5e;
+  --green-soft: #dfe8df;
+  --red: #a85c4a;
+  --radius: 10px;
+  --font-display: 'Shippori Mincho', serif;
+  --font-body: 'Zen Kaku Gothic New', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 0 0 40px;
+}
+
+.lm-page {
+  width: 100%;
+  max-width: 480px;
+  padding: 28px 20px 16px;
+}
+
+/* ---------- 日付ヘッダー ---------- */
+.lm-date-header {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: 0.02em;
+  margin: 0 0 4px;
+}
+
+.lm-sub-header {
+  color: var(--ink-soft);
+  font-size: 13px;
+  margin: 0 0 20px;
+}
+
+/* ---------- セクション(手帳の罫線区切り) ---------- */
+.lm-section {
+  border-top: 1px solid var(--paper-line);
+  padding: 16px 2px 18px;
+}
+
+.lm-section:first-of-type {
+  border-top: 1px solid var(--paper-line);
+}
+
+.lm-section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  margin: 0 0 10px;
+}
+
+.lm-section-title .lm-count {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+.lm-empty {
+  color: var(--ink-soft);
+  font-size: 13px;
+  padding: 4px 0;
+}
+
+/* ---------- 予定リスト ---------- */
+.lm-schedule-item {
+  display: flex;
+  gap: 12px;
+  padding: 6px 0;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.lm-schedule-item:hover {
+  background: var(--amber-soft);
+}
+
+.lm-schedule-time {
+  font-variant-numeric: tabular-nums;
+  color: var(--amber);
+  font-weight: 500;
+  min-width: 52px;
+}
+
+/* ---------- チェックリスト(持ちもの/タスク) ---------- */
+.lm-check-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lm-check-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 4px;
+  border-radius: 6px;
+}
+
+.lm-check-item input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--green);
+  flex-shrink: 0;
+}
+
+.lm-check-item.done span {
+  color: var(--ink-soft);
+  text-decoration: line-through;
+  text-decoration-color: var(--paper-line);
+}
+
+/* ---------- 勤務 ---------- */
+.lm-shift-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.lm-shift-pay {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--amber);
+  margin-top: 4px;
+}
+
+/* ---------- イベント進捗 ---------- */
+.lm-event {
+  margin-bottom: 14px;
+}
+
+.lm-event:last-child {
+  margin-bottom: 0;
+}
+
+.lm-event-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.lm-event-remain {
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.lm-progress-track {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--green-soft);
+  overflow: hidden;
+}
+
+.lm-progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 4px;
+}
+
+/* ---------- 下部ナビゲーション ---------- */
+.lm-nav {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.lm-nav-btn {
+  display: block;
+  text-align: center;
+  padding: 14px 6px;
+  background: #fff;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: border-color 0.15s ease;
+}
+
+.lm-nav-btn:active {
+  border-color: var(--amber);
+}
+
+/* ---------- フォーム共通(今後のページ用) ---------- */
+.lm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.lm-field label {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.lm-field input,
+.lm-field select,
+.lm-field textarea {
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 10px 12px;
+  border: 1px solid var(--paper-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.lm-field input:focus,
+.lm-field select:focus,
+.lm-field textarea:focus {
+  outline: 2px solid var(--amber);
+  outline-offset: 1px;
+}
+
+.lm-btn {
+  display: inline-block;
+  padding: 12px 18px;
+  border-radius: 8px;
+  border: none;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.lm-btn.secondary {
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--paper-line);
+}
+
+.lm-back-link {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
