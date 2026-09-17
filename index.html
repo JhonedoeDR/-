@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>今日のページ</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#faf8f3" />
+</head>
+<body>
+  <div class="lm-page">
+    <h1 class="lm-date-header" id="date-header"></h1>
+    <p class="lm-sub-header">今日のページ</p>
+
+    <section class="lm-section">
+      <div class="lm-section-title">予定</div>
+      <div id="schedule-list"></div>
+    </section>
+
+    <section class="lm-section">
+      <div class="lm-section-title">
+        持ちもの
+        <span class="lm-count" id="belongings-count"></span>
+      </div>
+      <div id="belongings-list"></div>
+    </section>
+
+    <section class="lm-section">
+      <div class="lm-section-title">
+        タスク
+        <span class="lm-count" id="tasks-count"></span>
+      </div>
+      <div id="tasks-list"></div>
+    </section>
+
+    <section class="lm-section">
+      <div class="lm-section-title">勤務</div>
+      <div id="shift-box"></div>
+    </section>
+
+    <section class="lm-section">
+      <div class="lm-section-title">イベント</div>
+      <div id="events-list"></div>
+    </section>
+
+    <div id="nav-container"></div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script src="./home.js"></script>
+</body>
+</html>
