@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>給与・シフト</title>
+  <link rel="stylesheet" href="./style.css" />
+  <meta name="theme-color" content="#faf8f3" />
+</head>
+<body>
+  <div class="lm-page">
+    <a class="lm-back-link" href="./index.html">← 今日のページに戻る</a>
+    <h1 class="lm-date-header">給与・シフト</h1>
+
+    <section class="lm-section" style="border-top:none;">
+      <div class="lm-section-title">基本設定</div>
+      <div class="lm-field">
+        <label for="f-wage">時給(円)</label>
+        <input id="f-wage" type="number" min="0" />
+      </div>
+      <div class="lm-field">
+        <label for="f-transport">交通費(1勤務あたり・円)</label>
+        <input id="f-transport" type="number" min="0" />
+      </div>
+    </section>
+
+    <section class="lm-section">
+      <div class="lm-section-title">シフトを登録</div>
+      <form id="shift-form">
+        <div class="lm-field">
+          <label for="f-date">日付</label>
+          <input id="f-date" type="date" required />
+        </div>
+        <div class="lm-field">
+          <label for="f-start">開始時刻</label>
+          <input id="f-start" type="time" required />
+        </div>
+        <div class="lm-field">
+          <label for="f-end">終了時刻</label>
+          <input id="f-end" type="time" required />
+        </div>
+        <div class="lm-field">
+          <label for="f-break">休憩時間(分)</label>
+          <input id="f-break" type="number" min="0" value="0" />
+        </div>
+        <div id="calc-preview" class="lm-empty"></div>
+        <button type="submit" class="lm-btn" style="margin-top:8px;">保存</button>
+      </form>
+    </section>
+
+    <section class="lm-section">
+      <div class="lm-section-title">
+        今月の集計
+        <span class="lm-count" id="month-label"></span>
+      </div>
+      <div id="month-summary" class="lm-shift-box"></div>
+    </section>
+
+    <section class="lm-section">
+      <div class="lm-section-title">シフト一覧</div>
+      <div id="shift-list"></div>
+    </section>
+
+    <div id="nav-container"></div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script src="./shift.js"></script>
+</body>
+</html>
