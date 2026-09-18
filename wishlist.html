@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>欲しいもの</title>
+  <link rel="stylesheet" href="./style.css" />
+  <meta name="theme-color" content="#faf8f3" />
+</head>
+<body>
+  <div class="lm-page">
+    <a class="lm-back-link" href="./index.html">← 今日のページに戻る</a>
+    <h1 class="lm-date-header">欲しいもの</h1>
+
+    <section class="lm-section" style="border-top:none;">
+      <div class="lm-section-title" id="form-title">追加する</div>
+      <form id="item-form">
+        <div class="lm-field">
+          <label for="f-name">名前</label>
+          <input id="f-name" required />
+        </div>
+        <div class="lm-field">
+          <label for="f-category">種類</label>
+          <select id="f-category">
+            <option value="本">本</option>
+            <option value="ゲーム">ゲーム</option>
+            <option value="グッズ">グッズ</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+        <div class="lm-field">
+          <label for="f-price">価格(円)</label>
+          <input id="f-price" type="number" min="0" />
+        </div>
+        <div class="lm-field">
+          <label for="f-url">販売ページURL</label>
+          <input id="f-url" type="url" />
+        </div>
+        <div class="lm-field">
+          <label for="f-desire">欲しい度(1〜5)</label>
+          <input id="f-desire" type="number" min="1" max="5" value="3" />
+        </div>
+        <div class="lm-field" style="flex-direction:row; align-items:center; gap:8px;">
+          <input id="f-plan" type="checkbox" style="width:18px; height:18px;" />
+          <label for="f-plan" style="margin:0;">今月買う予定</label>
+        </div>
+        <div class="lm-field">
+          <label for="f-memo">メモ</label>
+          <textarea id="f-memo" rows="2"></textarea>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button type="submit" class="lm-btn">保存</button>
+          <button type="button" id="cancel-edit" class="lm-btn secondary" style="display:none;">キャンセル</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="lm-section">
+      <div class="lm-section-title">金額集計</div>
+      <div id="totals" class="lm-shift-box"></div>
+    </section>
+
+    <section class="lm-section">
+      <div class="lm-section-title">未購入</div>
+      <div id="unpurchased-list"></div>
+    </section>
+
+    <section class="lm-section">
+      <div class="lm-section-title">購入済み</div>
+      <div id="purchased-list"></div>
+    </section>
+
+    <div id="nav-container"></div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script src="./wishlist.js"></script>
+</body>
+</html>
