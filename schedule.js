@@ -4,7 +4,6 @@
     name: document.getElementById('f-name'),
     date: document.getElementById('f-date'),
     start: document.getElementById('f-start'),
-    end: document.getElementById('f-end'),
     place: document.getElementById('f-place'),
     travel: document.getElementById('f-travel'),
     prep: document.getElementById('f-prep'),
@@ -14,13 +13,16 @@
   };
   const preview = document.getElementById('calc-preview');
   const formTitle = document.getElementById('form-title');
+  const stepIndicator = document.getElementById('step-indicator');
   const cancelBtn = document.getElementById('cancel-edit');
+  const steps = Array.from(document.querySelectorAll('.lm-step'));
 
   let editingId = null;
+  let currentStep = 1;
 
   populateBelongingOptions();
   fields.date.value = LM.todayStr();
-  updatePreview();
+  goToStep(1);
   renderList();
   document.getElementById('schedule-list').addEventListener('click', onListClick);
   LM.renderNav(document.getElementById('nav-container'));
@@ -30,20 +32,75 @@
   const openId = params.get('id');
   if (openId) startEdit(openId);
 
-  Object.values(fields).forEach((el) => {
+  [fields.start, fields.travel, fields.prep, fields.arrive].forEach((el) => {
     el.addEventListener('input', updatePreview);
+  });
+
+  // 「次へ」ボタン
+  document.querySelectorAll('[data-next]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetStep = Number(btn.dataset.next);
+      if (currentStep === 1 && !validateStep1()) return;
+      goToStep(targetStep);
+    });
+  });
+
+  // 「戻る」ボタン
+  document.querySelectorAll('[data-back]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      goToStep(Number(btn.dataset.back));
+    });
+  });
+
+  // 2段階目で「スキップして保存」(持ちもの・メモを入力せず確定)
+  document.querySelector('[data-skip-save]').addEventListener('click', () => {
+    if (!validateStep1()) {
+      goToStep(1);
+      return;
+    }
+    fields.belonging.value = '';
+    fields.memo.value = editingId ? fields.memo.value : '';
+    saveSchedule();
   });
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const schedules = LM.get(LM.KEYS.SCHEDULES, []);
+    if (!validateStep1()) {
+      goToStep(1);
+      return;
+    }
+    saveSchedule();
+  });
 
+  cancelBtn.addEventListener('click', resetForm);
+
+  function validateStep1() {
+    if (!fields.name.value.trim() || !fields.date.value || !fields.start.value) {
+      goToStep(1);
+      fields.name.reportValidity();
+      return false;
+    }
+    return true;
+  }
+
+  function goToStep(step) {
+    currentStep = step;
+    steps.forEach((el) => {
+      el.style.display = Number(el.dataset.step) === step ? '' : 'none';
+    });
+    stepIndicator.textContent = String(step);
+    if (step === 2) updatePreview();
+    window.scrollTo({ top: form.offsetTop - 20, behavior: 'smooth' });
+  }
+
+  function saveSchedule() {
+    const schedules = LM.get(LM.KEYS.SCHEDULES, []);
     const data = {
       id: editingId || LM.uid(),
       name: fields.name.value.trim(),
       date: fields.date.value,
       start: fields.start.value,
-      end: fields.end.value || '',
+      end: '',
       place: fields.place.value.trim(),
       travelMin: Number(fields.travel.value) || 0,
       prepMin: Number(fields.prep.value) || 0,
@@ -61,9 +118,7 @@
     LM.set(LM.KEYS.SCHEDULES, schedules);
     resetForm();
     renderList();
-  });
-
-  cancelBtn.addEventListener('click', resetForm);
+  }
 
   function startEdit(id) {
     const schedule = LM.get(LM.KEYS.SCHEDULES, []).find((s) => s.id === id);
@@ -72,17 +127,15 @@
     fields.name.value = schedule.name;
     fields.date.value = schedule.date;
     fields.start.value = schedule.start;
-    fields.end.value = schedule.end || '';
     fields.place.value = schedule.place || '';
     fields.travel.value = schedule.travelMin || 0;
     fields.prep.value = schedule.prepMin || 0;
     fields.arrive.value = schedule.arriveBeforeMin || 0;
     fields.belonging.value = schedule.belongingSetId || '';
     fields.memo.value = schedule.memo || '';
-    formTitle.textContent = '予定を編集';
+    formTitle.childNodes[0].textContent = '予定を編集(';
     cancelBtn.style.display = 'inline-block';
-    updatePreview();
-    form.scrollIntoView({ behavior: 'smooth' });
+    goToStep(1);
   }
 
   function resetForm() {
@@ -92,10 +145,10 @@
     fields.travel.value = 0;
     fields.prep.value = 0;
     fields.arrive.value = 0;
-    formTitle.textContent = '予定を登録';
+    formTitle.childNodes[0].textContent = '予定を登録(';
     cancelBtn.style.display = 'none';
     history.replaceState(null, '', location.pathname);
-    updatePreview();
+    goToStep(1);
   }
 
   function updatePreview() {
