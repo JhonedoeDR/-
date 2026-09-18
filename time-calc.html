@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>時間計算</title>
+  <link rel="stylesheet" href="./style.css" />
+  <meta name="theme-color" content="#faf8f3" />
+</head>
+<body>
+  <div class="lm-page">
+    <a class="lm-back-link" href="./index.html">← 今日のページに戻る</a>
+    <h1 class="lm-date-header">時間計算</h1>
+    <p class="lm-sub-header">作業時間を合計、または終了時刻から開始時刻を逆算します</p>
+
+    <section class="lm-section" style="border-top:none;">
+      <div class="lm-section-title">作業時間の合計</div>
+      <div id="work-list"></div>
+      <form id="work-form" style="display:flex; gap:8px; margin-top:10px;">
+        <input id="f-work-name" placeholder="作業名(例:風呂)" style="flex:2; font-family:var(--font-body); font-size:14px; padding:8px 10px; border:1px solid var(--paper-line); border-radius:8px;" required />
+        <input id="f-work-min" type="number" min="0" placeholder="分" style="flex:1; font-family:var(--font-body); font-size:14px; padding:8px 10px; border:1px solid var(--paper-line); border-radius:8px;" required />
+        <button type="submit" class="lm-btn secondary" style="padding:8px 14px;">追加</button>
+      </form>
+      <div id="work-total" style="margin-top:12px; font-size:16px; font-weight:700;"></div>
+    </section>
+
+    <section class="lm-section">
+      <div class="lm-section-title">終了時刻からの逆算</div>
+      <div class="lm-field">
+        <label for="f-end-time">終了したい時刻</label>
+        <input id="f-end-time" type="time" />
+      </div>
+      <div id="reverse-result" class="lm-empty"></div>
+    </section>
+
+    <div id="nav-container"></div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script src="./time-calc.js"></script>
+</body>
+</html>
