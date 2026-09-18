@@ -14,57 +14,72 @@
   <div class="lm-page">
     <a class="lm-back-link" href="./index.html">← 今日のページに戻る</a>
     <h1 class="lm-date-header">予定・逆算</h1>
-    <p class="lm-sub-header">予定を登録すると、準備開始・出発時刻を自動計算します</p>
+    <p class="lm-sub-header" id="form-title">予定を登録(<span id="step-indicator">1</span>/3)</p>
+    <button type="button" id="cancel-edit" class="lm-btn secondary" style="display:none; margin-bottom:12px;">編集をキャンセル</button>
 
     <section class="lm-section" style="border-top:none;">
-      <div class="lm-section-title" id="form-title">予定を登録</div>
       <form id="schedule-form">
-        <div class="lm-field">
-          <label for="f-name">予定名</label>
-          <input id="f-name" required />
+        <!-- 1段階目 -->
+        <div class="lm-step" data-step="1">
+          <div class="lm-field">
+            <label for="f-name">予定名</label>
+            <input id="f-name" required />
+          </div>
+          <div class="lm-field">
+            <label for="f-date">日付</label>
+            <input id="f-date" type="date" required />
+          </div>
+          <div class="lm-field">
+            <label for="f-start">開始時刻</label>
+            <input id="f-start" type="time" required />
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="lm-btn" data-next="2">次へ</button>
+          </div>
         </div>
-        <div class="lm-field">
-          <label for="f-date">日付</label>
-          <input id="f-date" type="date" required />
+
+        <!-- 2段階目 -->
+        <div class="lm-step" data-step="2" style="display:none;">
+          <div class="lm-field">
+            <label for="f-place">場所</label>
+            <input id="f-place" />
+          </div>
+          <div class="lm-field">
+            <label for="f-travel">移動時間(分)</label>
+            <input id="f-travel" type="number" min="0" value="0" />
+          </div>
+          <div class="lm-field">
+            <label for="f-prep">準備時間(分)</label>
+            <input id="f-prep" type="number" min="0" value="0" />
+          </div>
+          <div class="lm-field">
+            <label for="f-arrive">何分前に到着したいか</label>
+            <input id="f-arrive" type="number" min="0" value="0" />
+          </div>
+          <div id="calc-preview" class="lm-empty"></div>
+          <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+            <button type="button" class="lm-btn secondary" data-back="1">戻る</button>
+            <button type="button" class="lm-btn secondary" data-skip-save="1">スキップして保存</button>
+            <button type="button" class="lm-btn" data-next="3">次へ</button>
+          </div>
         </div>
-        <div class="lm-field">
-          <label for="f-start">開始時刻</label>
-          <input id="f-start" type="time" required />
-        </div>
-        <div class="lm-field">
-          <label for="f-end">終了時刻</label>
-          <input id="f-end" type="time" />
-        </div>
-        <div class="lm-field">
-          <label for="f-place">場所</label>
-          <input id="f-place" />
-        </div>
-        <div class="lm-field">
-          <label for="f-travel">移動時間(分)</label>
-          <input id="f-travel" type="number" min="0" value="0" />
-        </div>
-        <div class="lm-field">
-          <label for="f-prep">準備時間(分)</label>
-          <input id="f-prep" type="number" min="0" value="0" />
-        </div>
-        <div class="lm-field">
-          <label for="f-arrive">何分前に到着したいか</label>
-          <input id="f-arrive" type="number" min="0" value="0" />
-        </div>
-        <div class="lm-field">
-          <label for="f-belonging">持ちものセット</label>
-          <select id="f-belonging">
-            <option value="">なし</option>
-          </select>
-        </div>
-        <div class="lm-field">
-          <label for="f-memo">メモ</label>
-          <textarea id="f-memo" rows="2"></textarea>
-        </div>
-        <div id="calc-preview" class="lm-empty"></div>
-        <div style="display:flex; gap:8px; margin-top:12px;">
-          <button type="submit" class="lm-btn">保存</button>
-          <button type="button" id="cancel-edit" class="lm-btn secondary" style="display:none;">キャンセル</button>
+
+        <!-- 3段階目(任意) -->
+        <div class="lm-step" data-step="3" style="display:none;">
+          <div class="lm-field">
+            <label for="f-belonging">持ちものセット(任意)</label>
+            <select id="f-belonging">
+              <option value="">なし</option>
+            </select>
+          </div>
+          <div class="lm-field">
+            <label for="f-memo">メモ(任意)</label>
+            <textarea id="f-memo" rows="2"></textarea>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="lm-btn secondary" data-back="2">戻る</button>
+            <button type="submit" class="lm-btn">保存</button>
+          </div>
         </div>
       </form>
     </section>
