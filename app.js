@@ -114,6 +114,98 @@ LM.calcEventProgress = function (ev, todayStr) {
   return { remain, remainDays, perDay, rate };
 };
 
+/* ---------- 通知(Notification API・ページが開いている間のみ動作) ----------
+ * iOSのWeb/PWAはアプリを閉じた状態でのプッシュ通知に強い制約があるため、
+ * ここでは「ページを開いた時/開いている間にチェックして通知する」方式のみを実装する。
+ * 対象: (1)今日の予定の開始前 (2)予定の準備開始時刻 (3)イベント終了3日前以内
+ * ------------------------------------------------------------------------- */
+LM.NOTIFIED_KEY = 'lm_notifiedKeys';
+
+LM.requestNotificationPermission = async function () {
+  if (!('Notification' in window)) return 'unsupported';
+  if (Notification.permission === 'granted') return 'granted';
+  if (Notification.permission === 'denied') return 'denied';
+  return await Notification.requestPermission();
+};
+
+LM.notify = function (title, body) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    new Notification(title, { body, icon: './icons/icon-192.png' });
+  } catch (e) {
+    console.error('notify failed', e);
+  }
+};
+
+// 一度通知したキーは繰り返し通知しないよう記録する
+LM._alreadyNotified = function (key) {
+  const notified = LM.get(LM.NOTIFIED_KEY, []);
+  return notified.includes(key);
+};
+LM._markNotified = function (key) {
+  const notified = LM.get(LM.NOTIFIED_KEY, []);
+  notified.push(key);
+  // 古くなりすぎないよう直近500件のみ保持
+  LM.set(LM.NOTIFIED_KEY, notified.slice(-500));
+};
+
+LM.checkAndNotify = function () {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const now = new Date();
+  const today = LM.todayStr();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+
+  // (1)(2) 今日の予定: 開始10分前、準備開始10分前
+  const schedules = LM.get(LM.KEYS.SCHEDULES, []).filter((s) => s.date === today);
+  schedules.forEach((s) => {
+    const startMin = LM.clockToMinutes(s.start);
+    if (Math.abs(startMin - nowMin) <= 2) {
+      const key = `start:${s.id}:${today}`;
+      if (!LM._alreadyNotified(key)) {
+        LM.notify('まもなく予定の時間です', `${s.name}(${s.start}〜)`);
+        LM._markNotified(key);
+      }
+    }
+    if (s.prepMin || s.travelMin || s.arriveBeforeMin) {
+      const { prepStart } = LM.calcDeparture(s);
+      const prepStartMin = LM.clockToMinutes(prepStart);
+      if (Math.abs(prepStartMin - nowMin) <= 2) {
+        const key = `prep:${s.id}:${today}`;
+        if (!LM._alreadyNotified(key)) {
+          LM.notify('準備を始める時間です', `${s.name}の準備開始時刻です`);
+          LM._markNotified(key);
+        }
+      }
+    }
+  });
+
+  // (3) イベント終了3日前以内、かつ1日1回だけ通知
+  const events = LM.get(LM.KEYS.EVENTS, []).filter((ev) => ev.end >= today);
+  events.forEach((ev) => {
+    const remainDays = LM.daysBetween(today, ev.end);
+    if (remainDays <= 3) {
+      const key = `event:${ev.id}:${today}`;
+      if (!LM._alreadyNotified(key)) {
+        LM.notify('イベント終了が近づいています', `${ev.name}(残り${remainDays}日)`);
+        LM._markNotified(key);
+      }
+    }
+  });
+};
+
+// ページ表示時とその後1分ごとにチェック(ページを開いている間のみ動作)
+LM.startNotificationLoop = function () {
+  LM.checkAndNotify();
+  setInterval(LM.checkAndNotify, 60 * 1000);
+};
+
+/* ---------- Service Worker登録(PWA・オフライン対応) ---------- */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch((e) => console.error('SW registration failed', e));
+  });
+}
+
 /* ---------- ナビゲーション(共通フッターボタン)描画 ---------- */
 LM.renderNav = function (container) {
   const nav = document.createElement('nav');
