@@ -7,7 +7,32 @@
   renderTasks();
   renderShift();
   renderEvents();
+  renderNotifyBanner();
   LM.renderNav(document.getElementById('nav-container'));
+
+  /* ---------- 通知の有効化バナー ---------- */
+  function renderNotifyBanner() {
+    const el = document.getElementById('notify-banner');
+    if (!('Notification' in window)) {
+      el.innerHTML = '';
+      return;
+    }
+    if (Notification.permission === 'granted') {
+      LM.startNotificationLoop();
+      el.innerHTML = '';
+      return;
+    }
+    if (Notification.permission === 'denied') {
+      el.innerHTML = '<p class="lm-empty">通知がブロックされています(端末の設定から許可できます)</p>';
+      return;
+    }
+    el.innerHTML = '<button type="button" id="enable-notify" class="lm-btn secondary" style="margin-bottom:8px;">通知を有効にする</button>';
+    document.getElementById('enable-notify').addEventListener('click', async () => {
+      const result = await LM.requestNotificationPermission();
+      renderNotifyBanner();
+      if (result === 'granted') LM.startNotificationLoop();
+    });
+  }
 
   /* ---------- 今日の予定 ---------- */
   function renderSchedules() {
