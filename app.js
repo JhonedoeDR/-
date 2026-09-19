@@ -218,6 +218,46 @@ LM.importAllData = function (data) {
   });
 };
 
+/* ---------- モーダル(レイヤー表示) ---------- */
+LM.openModal = function (title, contentEl) {
+  LM.closeModal();
+  const overlay = document.createElement('div');
+  overlay.className = 'lm-modal-overlay';
+  overlay.innerHTML = `
+    <div class="lm-modal">
+      <div class="lm-modal-header">
+        <strong>${title}</strong>
+        <button type="button" class="lm-modal-close">✕</button>
+      </div>
+      <div class="lm-modal-body"></div>
+    </div>
+  `;
+  overlay.querySelector('.lm-modal-body').appendChild(contentEl);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) LM.closeModal();
+  });
+  overlay.querySelector('.lm-modal-close').addEventListener('click', LM.closeModal);
+  document.body.appendChild(overlay);
+};
+
+LM.closeModal = function () {
+  const overlay = document.querySelector('.lm-modal-overlay');
+  if (overlay) overlay.remove();
+};
+
+/* ---------- トースト通知(右下に表示) ---------- */
+LM.showToast = function (message, type) {
+  const toast = document.createElement('div');
+  toast.className = 'lm-toast' + (type === 'error' ? ' error' : '');
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 2600);
+};
+
 /* ---------- 期限切れ予定の自動削除(日付が今日より前のものを削除) ---------- */
 (function purgeExpiredSchedules() {
   const today = LM.todayStr();
@@ -246,12 +286,17 @@ LM.renderNav = function (container) {
     { href: './shift.html', label: '給与・シフト' },
     { href: './wishlist.html', label: '欲しいもの' },
     { href: './event.html', label: 'イベント' },
+    { href: 'https://jhonedoedr.github.io/MyBookLog/', label: 'よみもの記録', external: true },
   ];
   items.forEach((it) => {
     const a = document.createElement('a');
     a.href = it.href;
     a.className = 'lm-nav-btn';
     a.textContent = it.label;
+    if (it.external) {
+      a.target = '_blank';
+      a.rel = 'noopener';
+    }
     nav.appendChild(a);
   });
   container.appendChild(nav);
