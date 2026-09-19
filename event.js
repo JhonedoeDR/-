@@ -134,9 +134,9 @@
       box.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:baseline;">
           <strong>${escapeHtml(ev.name)}</strong>
-          <span style="font-size:12px; color:var(--ink-soft);">${ev.start}〜${ev.end}</span>
+          <span style="font-size:12px; color:var(--text-soft);">${ev.start}〜${ev.end}</span>
         </div>
-        <div style="font-size:13px; color:var(--ink-soft); margin:2px 0;">${ev.current.toLocaleString()} / ${ev.target.toLocaleString()}${escapeHtml(ev.unit)}</div>
+        <div style="font-size:13px; color:var(--text-soft); margin:2px 0;">${ev.current.toLocaleString()} / ${ev.target.toLocaleString()}${escapeHtml(ev.unit)}</div>
         ${progressHtml}
         <div style="display:flex; gap:6px; margin-top:8px;">
           <button type="button" data-edit="${ev.id}" class="lm-btn secondary" style="padding:4px 10px; font-size:12px;">編集</button>
