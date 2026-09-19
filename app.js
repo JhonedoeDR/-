@@ -1,20 +1,21 @@
 /* =========================================================
    生活管理ツール - 共通データレイヤー / ユーティリティ
    全ページ(index.html, schedule.html, ...)から <script src="./app.js"> で読み込む。
-========================================================= */
+   ========================================================= */
+
 const LM = {};
 
 /* ---------- localStorage キー一覧 ----------
- * lm_schedules     : 予定 [{id, name, date, start, end, place, travelMin, prepMin, arriveBeforeMin, belongingSetId, memo}]
- * lm_belongingSets : 持ちものセット [{id, name, items:[{id, name}]}]
- * lm_dailyChecks   : 日付ごとの持ちものチェック { "2026-09-18": { checkedItemIds: [...] } }
- * lm_tasks         : 日付ごとのタスク { "2026-09-18": [{id, text, done, main}] }
- *                    main: trueのタスクはホームの「メインタスク」として最大3件表示される
- * lm_shifts        : シフト [{id, date, start, end, breakMin}]
- * lm_wageSettings  : 給与設定 {hourlyWage, transportFee}
- * lm_events        : イベント [{id, name, start, end, target, current, unit}]
- * lm_wishlist      : 欲しいものリスト [{id, name, category, price, url, desire, planThisMonth, purchased, memo}]
+ * lm_schedules      : 予定 [{id, name, date, start, end, place, travelMin, prepMin, arriveBeforeMin, belongingSetId, memo}]
+ * lm_belongingSets   : 持ちものセット [{id, name, items:[{id, name}]}]
+ * lm_dailyChecks     : 日付ごとの持ちものチェック { "2026-09-18": { checkedItemIds: [...] } }
+ * lm_tasks           : 日付ごとのタスク { "2026-09-18": [{id, text, done}] }
+ * lm_shifts          : シフト [{id, date, start, end, breakMin}]
+ * lm_wageSettings    : 給与設定 {hourlyWage, transportFee}
+ * lm_events          : イベント [{id, name, start, end, target, current, unit}]
+ * lm_wishlist        : 欲しいものリスト [{id, name, category, price, url, desire, planThisMonth, purchased, memo}]
  * -------------------------------------------- */
+
 LM.KEYS = {
   SCHEDULES: 'lm_schedules',
   BELONGING_SETS: 'lm_belongingSets',
@@ -142,7 +143,6 @@ LM._alreadyNotified = function (key) {
   const notified = LM.get(LM.NOTIFIED_KEY, []);
   return notified.includes(key);
 };
-
 LM._markNotified = function (key) {
   const notified = LM.get(LM.NOTIFIED_KEY, []);
   notified.push(key);
@@ -218,6 +218,81 @@ LM.importAllData = function (data) {
   });
 };
 
+/* ---------- タスク(固定枠のデイリーTodo・週間メインタスク記録) ---------- */
+LM.TODO_KEY = 'lm_todoState';
+LM.TODO_GROUPS = [
+  { key: 'main', label: 'メイン', isMain: true, ids: ['main1', 'main2', 'main3'] },
+  { key: 'priority', label: '優先', isMain: false, ids: ['pri1', 'pri2', 'pri3'] },
+  { key: 'plus', label: 'プラス', isMain: false, ids: ['plus1', 'plus2', 'plus3'] },
+  { key: 'gap', label: 'スキマ', isMain: false, ids: ['gap1', 'gap2', 'gap3'] },
+  { key: 'routine', label: 'ルーティン', isMain: false, ids: ['rt1', 'rt2', 'rt3'] },
+  { key: 'other', label: 'その他', isMain: false, ids: ['other1'] },
+];
+LM.TODO_MAIN_IDS = ['main1', 'main2', 'main3'];
+LM.TODO_WEEK_TOTAL = 14;
+
+LM.todoMondayKey = function (d) {
+  d = d || new Date();
+  const date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const day = date.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  date.setDate(date.getDate() + diff);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${dd}`;
+};
+
+LM.defaultTodoTasks = function () {
+  const tasks = {};
+  LM.TODO_GROUPS.forEach((g) => g.ids.forEach((id) => (tasks[id] = { name: '', checked: false })));
+  return tasks;
+};
+LM.defaultTodoReflected = function () {
+  const r = {};
+  LM.TODO_MAIN_IDS.forEach((id) => (r[id] = false));
+  return r;
+};
+LM.defaultTodoState = function () {
+  return {
+    dailyTasks: LM.defaultTodoTasks(),
+    weeklyClears: 0,
+    reflected: LM.defaultTodoReflected(),
+    weekStartDate: LM.todoMondayKey(),
+  };
+};
+
+LM.getTodoState = function () {
+  let state = LM.get(LM.TODO_KEY, null);
+  if (!state) state = LM.defaultTodoState();
+  if (!state.dailyTasks) state.dailyTasks = LM.defaultTodoTasks();
+  if (typeof state.weeklyClears !== 'number') state.weeklyClears = 0;
+  if (!state.reflected) state.reflected = LM.defaultTodoReflected();
+  if (!state.weekStartDate) state.weekStartDate = LM.todoMondayKey();
+  const thisMonday = LM.todoMondayKey();
+  if (state.weekStartDate !== thisMonday) {
+    state.weekStartDate = thisMonday;
+    state.weeklyClears = 0;
+    state.reflected = LM.defaultTodoReflected();
+    LM.set(LM.TODO_KEY, state);
+  }
+  return state;
+};
+
+LM.saveTodoState = function (state) {
+  LM.set(LM.TODO_KEY, state);
+};
+
+// メインタスクを初めてチェックした時だけ週間クリア数を+1する(週をまたぐとリセット)
+LM.toggleTodoCheck = function (state, id, checked) {
+  state.dailyTasks[id].checked = checked;
+  if (LM.TODO_MAIN_IDS.includes(id) && checked && !state.reflected[id] && state.weeklyClears < LM.TODO_WEEK_TOTAL) {
+    state.weeklyClears += 1;
+    state.reflected[id] = true;
+  }
+  LM.saveTodoState(state);
+};
+
 /* ---------- モーダル(レイヤー表示) ---------- */
 LM.openModal = function (title, contentEl) {
   LM.closeModal();
@@ -282,8 +357,8 @@ LM.renderNav = function (container) {
   const items = [
     { href: './schedule.html', label: '予定・逆算' },
     { href: './belongings.html', label: '持ちもの' },
-    { href: './todo.html', label: 'Todo' },
     { href: './time-calc.html', label: '時間計算' },
+    { href: './todo.html', label: 'タスク' },
     { href: './shift.html', label: '給与・シフト' },
     { href: './wishlist.html', label: '欲しいもの' },
     { href: './event.html', label: 'イベント' },
