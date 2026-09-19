@@ -134,7 +134,7 @@
           <strong>${escapeHtml(it.name)}</strong>
           <span>¥${it.price.toLocaleString()}</span>
         </div>
-        <div style="font-size:12px; color:var(--ink-soft); margin:2px 0 6px;">
+        <div style="font-size:12px; color:var(--text-soft); margin:2px 0 6px;">
           ${escapeHtml(it.category)} ・ 欲しい度${it.desire} ${it.planThisMonth ? '・ 今月買う予定' : ''}
           ${it.url ? ` ・ <a href="${escapeHtml(it.url)}" target="_blank" rel="noopener">販売ページ</a>` : ''}
         </div>
