@@ -1,21 +1,20 @@
 /* =========================================================
    生活管理ツール - 共通データレイヤー / ユーティリティ
    全ページ(index.html, schedule.html, ...)から <script src="./app.js"> で読み込む。
-   ========================================================= */
-
+========================================================= */
 const LM = {};
 
 /* ---------- localStorage キー一覧 ----------
- * lm_schedules      : 予定 [{id, name, date, start, end, place, travelMin, prepMin, arriveBeforeMin, belongingSetId, memo}]
- * lm_belongingSets   : 持ちものセット [{id, name, items:[{id, name}]}]
- * lm_dailyChecks     : 日付ごとの持ちものチェック { "2026-09-18": { checkedItemIds: [...] } }
- * lm_tasks           : 日付ごとのタスク { "2026-09-18": [{id, text, done}] }
- * lm_shifts          : シフト [{id, date, start, end, breakMin}]
- * lm_wageSettings    : 給与設定 {hourlyWage, transportFee}
- * lm_events          : イベント [{id, name, start, end, target, current, unit}]
- * lm_wishlist        : 欲しいものリスト [{id, name, category, price, url, desire, planThisMonth, purchased, memo}]
+ * lm_schedules     : 予定 [{id, name, date, start, end, place, travelMin, prepMin, arriveBeforeMin, belongingSetId, memo}]
+ * lm_belongingSets : 持ちものセット [{id, name, items:[{id, name}]}]
+ * lm_dailyChecks   : 日付ごとの持ちものチェック { "2026-09-18": { checkedItemIds: [...] } }
+ * lm_tasks         : 日付ごとのタスク { "2026-09-18": [{id, text, done, main}] }
+ *                    main: trueのタスクはホームの「メインタスク」として最大3件表示される
+ * lm_shifts        : シフト [{id, date, start, end, breakMin}]
+ * lm_wageSettings  : 給与設定 {hourlyWage, transportFee}
+ * lm_events        : イベント [{id, name, start, end, target, current, unit}]
+ * lm_wishlist      : 欲しいものリスト [{id, name, category, price, url, desire, planThisMonth, purchased, memo}]
  * -------------------------------------------- */
-
 LM.KEYS = {
   SCHEDULES: 'lm_schedules',
   BELONGING_SETS: 'lm_belongingSets',
@@ -143,6 +142,7 @@ LM._alreadyNotified = function (key) {
   const notified = LM.get(LM.NOTIFIED_KEY, []);
   return notified.includes(key);
 };
+
 LM._markNotified = function (key) {
   const notified = LM.get(LM.NOTIFIED_KEY, []);
   notified.push(key);
@@ -282,6 +282,7 @@ LM.renderNav = function (container) {
   const items = [
     { href: './schedule.html', label: '予定・逆算' },
     { href: './belongings.html', label: '持ちもの' },
+    { href: './todo.html', label: 'Todo' },
     { href: './time-calc.html', label: '時間計算' },
     { href: './shift.html', label: '給与・シフト' },
     { href: './wishlist.html', label: '欲しいもの' },
