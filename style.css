@@ -118,6 +118,11 @@ body {
   margin-top: 2px;
 }
 
+.lm-schedule-departure strong {
+  color: var(--amber);
+  font-weight: 500;
+}
+
 /* ---------- チェックリスト(持ちもの/タスク) ---------- */
 .lm-check-list {
   list-style: none;
