@@ -16,35 +16,39 @@
     <p class="lm-sub-header">今日のページ</p>
     <div id="notify-banner"></div>
 
-    <section class="lm-section">
+    <section class="lm-section" data-section="event">
+      <div class="lm-section-title">イベント</div>
+      <div id="events-list"></div>
+    </section>
+
+    <section class="lm-section" data-section="schedule">
       <div class="lm-section-title">予定</div>
       <div id="schedule-list"></div>
     </section>
 
-    <section class="lm-section">
+    <section class="lm-section" data-section="belongings">
       <div class="lm-section-title">
         持ちもの
         <span class="lm-count" id="belongings-count"></span>
       </div>
-      <div id="belongings-list"></div>
+      <div id="belongings-list" class="lm-card-grid"></div>
     </section>
 
-    <section class="lm-section">
+    <section class="lm-section" data-section="task">
       <div class="lm-section-title">
         タスク
         <span class="lm-count" id="tasks-count"></span>
       </div>
+      <form id="task-form" style="display:flex; gap:8px; margin-bottom:10px;">
+        <input id="f-task-text" placeholder="タスクを追加" style="flex:1; min-width:0; font-family:var(--font-body); font-size:16px; padding:8px 10px; border:1px solid var(--paper-line); border-radius:8px;" required />
+        <button type="submit" class="lm-btn secondary" style="padding:8px 14px;">追加</button>
+      </form>
       <div id="tasks-list"></div>
     </section>
 
-    <section class="lm-section">
+    <section class="lm-section" data-section="shift">
       <div class="lm-section-title">勤務</div>
       <div id="shift-box"></div>
-    </section>
-
-    <section class="lm-section">
-      <div class="lm-section-title">イベント</div>
-      <div id="events-list"></div>
     </section>
 
     <div id="nav-container"></div>
