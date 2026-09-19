@@ -229,6 +229,7 @@ body {
   border-color: var(--amber);
 }
 
+
 /* ---------- フォーム共通(今後のページ用) ---------- */
 .lm-field {
   display: flex;
