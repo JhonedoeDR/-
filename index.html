@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>今日のページ</title>
   <link rel="stylesheet" href="./style.css" />
   <link rel="manifest" href="./manifest.json" />
@@ -48,6 +48,18 @@
     </section>
 
     <div id="nav-container"></div>
+
+    <section class="lm-section">
+      <div class="lm-section-title">データのバックアップ</div>
+      <p class="lm-empty" style="margin-bottom:10px;">端末側の事情でデータが消えることがあるため、時々バックアップの保存をおすすめします</p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="button" id="export-btn" class="lm-btn secondary">バックアップを保存</button>
+        <label class="lm-btn secondary" style="cursor:pointer;">
+          バックアップから復元
+          <input type="file" id="import-input" accept="application/json" style="display:none;" />
+        </label>
+      </div>
+    </section>
   </div>
 
   <script src="./app.js"></script>
