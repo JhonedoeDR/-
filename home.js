@@ -52,10 +52,7 @@
       row.className = 'lm-schedule-item';
       row.href = `./schedule.html?id=${encodeURIComponent(s.id)}`;
 
-      const hasCalc = (s.travelMin || 0) + (s.prepMin || 0) + (s.arriveBeforeMin || 0) > 0;
-      const departureHtml = hasCalc
-        ? `<div class="lm-schedule-departure">出発 ${LM.calcDeparture(s).depart}</div>`
-        : '';
+      const departureHtml = `<div class="lm-schedule-departure">出発 ${LM.calcDeparture(s).depart}</div>`;
 
       row.innerHTML = `
         <span class="lm-schedule-time">${s.start}</span>
