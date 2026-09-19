@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
 
 :root {
-  --paper: #faeee7;
-  --paper-line: #99918d;
-  --text: #33272a;
-  --text-soft: #594a4e;
-  --accent: #ff8ba7;
-  --accent-soft: #ffc6c7;
-  --teal: #ff8ba7;
-  --teal-soft: #ffc6c7;
+  --paper: #ffffff;
+  --paper-line: #e3e8ee;
+  --text: #65aaed;
+  --text-soft: #90c2f2;
+  --accent: #ffded7;
+  --accent-soft: #fff6f4;
+  --teal: #c7e6e8;
+  --teal-soft: #f4fafb;
   --red: #a85c4a;
   --radius: 10px;
   --font-display: 'Shippori Mincho', serif;
@@ -152,14 +152,6 @@ body {
   color: var(--text-soft);
   text-decoration: line-through;
   text-decoration-color: var(--paper-line);
-}
-
-/* ---------- タスク:ホームでの「他n件」表示 ---------- */
-.lm-task-more {
-  text-align: right;
-  font-size: 12px;
-  color: var(--text-soft);
-  margin-top: 6px;
 }
 
 /* ---------- 勤務 ---------- */
@@ -400,7 +392,7 @@ body {
   padding: 6px 14px;
 }
 
-/* ---------- カードグリッド(今日の持ちもの・正方形・最大3列) ---------- */
+/* ---------- カードグリッド(今日の持ちもの) ---------- */
 .lm-card-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -416,8 +408,9 @@ body {
   cursor: pointer;
   aspect-ratio: 1 / 1;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   overflow: hidden;
 }
 
@@ -428,8 +421,10 @@ body {
 }
 
 .lm-card-count {
-  align-self: flex-end;
-  font-size: 12px;
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 11px;
   color: var(--text-soft);
 }
 
@@ -467,4 +462,78 @@ body {
 
 .lm-collapsible.open .lm-collapsible-body {
   display: block;
+}
+
+/* ---------- タスクページ(固定枠グループ) ---------- */
+.lm-todo-group {
+  margin-bottom: 18px;
+}
+
+.lm-todo-group-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.lm-todo-group-label.is-main {
+  color: var(--accent);
+}
+
+.lm-todo-group-label .count {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-soft);
+  font-weight: 400;
+}
+
+.lm-todo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.lm-todo-row input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+.lm-todo-row input[type='text'] {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 16px;
+  padding: 8px 10px;
+  border: 1px solid var(--paper-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+}
+
+.lm-todo-row.is-checked input[type='text'] {
+  color: var(--text-soft);
+  text-decoration: line-through;
+  text-decoration-color: var(--paper-line);
+}
+
+.lm-week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.lm-week-cell {
+  height: 24px;
+  border-radius: 5px;
+  background: var(--paper-line);
+}
+
+.lm-week-cell.is-filled {
+  background: var(--accent);
 }
