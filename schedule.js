@@ -8,9 +8,9 @@
     travel: document.getElementById('f-travel'),
     prep: document.getElementById('f-prep'),
     arrive: document.getElementById('f-arrive'),
-    belonging: document.getElementById('f-belonging'),
     memo: document.getElementById('f-memo'),
   };
+  const belongingList = document.getElementById('f-belonging-list');
   const preview = document.getElementById('calc-preview');
   const formTitle = document.getElementById('form-title');
   const stepIndicator = document.getElementById('step-indicator');
@@ -58,8 +58,7 @@
       goToStep(1);
       return;
     }
-    fields.belonging.value = '';
-    fields.memo.value = editingId ? fields.memo.value : '';
+    belongingList.querySelectorAll('input[type="checkbox"]').forEach((cb) => (cb.checked = false));
     saveSchedule();
   });
 
@@ -93,6 +92,10 @@
     window.scrollTo({ top: form.offsetTop - 20, behavior: 'smooth' });
   }
 
+  function getSelectedBelongingIds() {
+    return Array.from(belongingList.querySelectorAll('input[type="checkbox"]:checked')).map((cb) => cb.value);
+  }
+
   function saveSchedule() {
     const schedules = LM.get(LM.KEYS.SCHEDULES, []);
     const data = {
@@ -105,7 +108,7 @@
       travelMin: Number(fields.travel.value) || 0,
       prepMin: Number(fields.prep.value) || 0,
       arriveBeforeMin: Number(fields.arrive.value) || 0,
-      belongingSetId: fields.belonging.value || null,
+      belongingSetIds: getSelectedBelongingIds(),
       memo: fields.memo.value.trim(),
     };
 
@@ -115,7 +118,8 @@
     } else {
       schedules.push(data);
     }
-    LM.set(LM.KEYS.SCHEDULES, schedules);
+    const ok = LM.set(LM.KEYS.SCHEDULES, schedules);
+    if (!ok) return;
     resetForm();
     renderList();
   }
@@ -131,8 +135,11 @@
     fields.travel.value = schedule.travelMin || 0;
     fields.prep.value = schedule.prepMin || 0;
     fields.arrive.value = schedule.arriveBeforeMin || 0;
-    fields.belonging.value = schedule.belongingSetId || '';
     fields.memo.value = schedule.memo || '';
+    const selectedIds = schedule.belongingSetIds || (schedule.belongingSetId ? [schedule.belongingSetId] : []);
+    belongingList.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+      cb.checked = selectedIds.includes(cb.value);
+    });
     formTitle.childNodes[0].textContent = '予定を編集(';
     cancelBtn.style.display = 'inline-block';
     goToStep(1);
@@ -145,6 +152,7 @@
     fields.travel.value = 0;
     fields.prep.value = 0;
     fields.arrive.value = 0;
+    belongingList.querySelectorAll('input[type="checkbox"]').forEach((cb) => (cb.checked = false));
     formTitle.childNodes[0].textContent = '予定を登録(';
     cancelBtn.style.display = 'none';
     history.replaceState(null, '', location.pathname);
@@ -167,11 +175,16 @@
 
   function populateBelongingOptions() {
     const sets = LM.get(LM.KEYS.BELONGING_SETS, []);
+    if (sets.length === 0) {
+      belongingList.innerHTML = '<p class="lm-empty">持ちものセットがまだありません</p>';
+      return;
+    }
+    belongingList.innerHTML = '';
     sets.forEach((set) => {
-      const opt = document.createElement('option');
-      opt.value = set.id;
-      opt.textContent = set.name;
-      fields.belonging.appendChild(opt);
+      const label = document.createElement('label');
+      label.className = 'lm-check-item';
+      label.innerHTML = `<input type="checkbox" value="${set.id}" /><span>${escapeHtml(set.name)}</span>`;
+      belongingList.appendChild(label);
     });
   }
 
