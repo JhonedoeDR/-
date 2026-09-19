@@ -52,7 +52,7 @@
       row.className = 'lm-schedule-item';
       row.href = `./schedule.html?id=${encodeURIComponent(s.id)}`;
 
-      const departureHtml = `<div class="lm-schedule-departure">出発 ${LM.calcDeparture(s).depart}</div>`;
+      const departureHtml = renderDepartureLine(s);
 
       row.innerHTML = `
         <span class="lm-schedule-time">${s.start}</span>
@@ -218,7 +218,11 @@
       el.appendChild(box);
     });
   }
-  
+
+  function renderDepartureLine(s) {
+    const r = LM.calcDeparture(s);
+    return `<div class="lm-schedule-departure">準備開始 <strong>${r.prepStart}</strong> ・ 出発 <strong>${r.depart}</strong></div>`;
+  }
 
   function escapeHtml(str) {
     const div = document.createElement('div');
