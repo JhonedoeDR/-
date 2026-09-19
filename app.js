@@ -45,6 +45,7 @@ LM.set = function (key, value) {
     return true;
   } catch (e) {
     console.error('LM.set failed for', key, e);
+    alert('データの保存に失敗しました。\n理由: ' + (e && e.message ? e.message : e));
     return false;
   }
 };
@@ -198,6 +199,34 @@ LM.startNotificationLoop = function () {
   LM.checkAndNotify();
   setInterval(LM.checkAndNotify, 60 * 1000);
 };
+
+/* ---------- バックアップ(全データの書き出し/読み込み) ---------- */
+LM.exportAllData = function () {
+  const data = {};
+  Object.values(LM.KEYS).forEach((k) => {
+    const raw = localStorage.getItem(k);
+    if (raw !== null) data[k] = JSON.parse(raw);
+  });
+  const raw = localStorage.getItem('lm_timeCalcItems');
+  if (raw !== null) data['lm_timeCalcItems'] = JSON.parse(raw);
+  return data;
+};
+
+LM.importAllData = function (data) {
+  Object.entries(data).forEach(([k, v]) => {
+    localStorage.setItem(k, JSON.stringify(v));
+  });
+};
+
+/* ---------- 期限切れ予定の自動削除(日付が今日より前のものを削除) ---------- */
+(function purgeExpiredSchedules() {
+  const today = LM.todayStr();
+  const schedules = LM.get(LM.KEYS.SCHEDULES, []);
+  const filtered = schedules.filter((s) => s.date >= today);
+  if (filtered.length !== schedules.length) {
+    LM.set(LM.KEYS.SCHEDULES, filtered);
+  }
+})();
 
 /* ---------- Service Worker登録(PWA・オフライン対応) ---------- */
 if ('serviceWorker' in navigator) {
