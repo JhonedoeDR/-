@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lm-cache-v1';
+const CACHE_NAME = 'lm-cache-v2';
 const ASSETS = [
   './',
   './index.html',
