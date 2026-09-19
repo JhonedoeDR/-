@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lm-cache-v2';
+const CACHE_NAME = 'lm-cache-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -39,7 +39,7 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request, { cache: 'no-store' })
       .then((res) => {
         const resClone = res.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(e.request, resClone));
