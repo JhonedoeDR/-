@@ -1,10 +1,13 @@
 (function () {
+  const PAGE_SIZE = 5;
   const setForm = document.getElementById('set-form');
   const setNameInput = document.getElementById('f-set-name');
   const listEl = document.getElementById('set-list');
 
+  let page = 0;
+
   render();
-  listEl.addEventListener('click', onListClick);
+  document.addEventListener('click', onGlobalClick);
   LM.renderNav(document.getElementById('nav-container'));
 
   setForm.addEventListener('submit', (e) => {
@@ -20,62 +23,100 @@
 
   function render() {
     const sets = LM.get(LM.KEYS.BELONGING_SETS, []);
+    renderPaged(listEl, sets, false);
+  }
 
+  function renderPaged(container, sets, isModal) {
+    container.innerHTML = '';
     if (sets.length === 0) {
-      listEl.innerHTML = '<p class="lm-empty">セットはまだ登録されていません</p>';
+      container.innerHTML = '<p class="lm-empty">セットはまだ登録されていません</p>';
       return;
     }
 
-    listEl.innerHTML = '';
-    sets.forEach((set) => {
-      const box = document.createElement('div');
-      box.style.marginBottom = '20px';
-      box.style.paddingBottom = '16px';
-      box.style.borderBottom = '1px solid var(--paper-line)';
+    let pageItems = sets;
+    if (!isModal) {
+      const totalPages = Math.max(1, Math.ceil(sets.length / PAGE_SIZE));
+      if (page >= totalPages) page = totalPages - 1;
+      pageItems = sets.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+    }
 
-      const itemsHtml = set.items
-        .map(
-          (it) => `
-        <li class="lm-check-item" style="justify-content:space-between;">
-          <span>${escapeHtml(it.name)}</span>
-          <button type="button" data-remove-item="${set.id}:${it.id}" class="lm-btn secondary" style="padding:4px 8px; font-size:12px;">削除</button>
-        </li>`
-        )
-        .join('');
+    pageItems.forEach((set) => container.appendChild(renderSetBox(set)));
 
-      box.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <strong style="font-family:var(--font-display); font-size:15px;">${escapeHtml(set.name)}</strong>
-          <button type="button" data-delete-set="${set.id}" class="lm-btn secondary" style="padding:6px 10px; font-size:12px;">セット削除</button>
-        </div>
+    if (!isModal && sets.length > PAGE_SIZE) {
+      const totalPages = Math.max(1, Math.ceil(sets.length / PAGE_SIZE));
+      const pager = document.createElement('div');
+      pager.className = 'lm-pager';
+      pager.innerHTML = `
+        <button type="button" data-prev="1" ${page === 0 ? 'disabled' : ''}>◀</button>
+        <span>${page + 1}/${totalPages}</span>
+        <button type="button" data-next="1" ${page >= totalPages - 1 ? 'disabled' : ''}>▶</button>
+      `;
+      container.appendChild(pager);
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'lm-btn secondary lm-list-all-btn';
+      btn.dataset.listAll = '1';
+      btn.textContent = '一覧表示';
+      container.appendChild(btn);
+    }
+  }
+
+  function renderSetBox(set) {
+    const wrap = document.createElement('div');
+    wrap.className = 'lm-collapsible';
+
+    const itemsHtml = set.items
+      .map(
+        (it) => `
+      <li class="lm-check-item" style="justify-content:space-between;">
+        <span>${escapeHtml(it.name)}</span>
+        <button type="button" data-remove-item="${set.id}:${it.id}" class="lm-btn secondary" style="padding:4px 8px; font-size:12px;">削除</button>
+      </li>`
+      )
+      .join('');
+
+    wrap.innerHTML = `
+      <div class="lm-collapsible-header" data-toggle-set="${set.id}">
+        <strong>${escapeHtml(set.name)}(${set.items.length})</strong>
+        <span class="lm-collapsible-arrow">▶</span>
+      </div>
+      <div class="lm-collapsible-body">
         <ul class="lm-check-list">${itemsHtml || '<li class="lm-empty">まだ持ちものが登録されていません</li>'}</ul>
         <form data-add-item="${set.id}" style="display:flex; gap:8px; margin-top:8px;">
           <input placeholder="持ちものを追加" style="flex:1; min-width:0; font-family:var(--font-body); font-size:16px; padding:8px 10px; border:1px solid var(--paper-line); border-radius:8px;" required />
           <button type="submit" class="lm-btn secondary" style="padding:8px 14px;">追加</button>
         </form>
-      `;
-      listEl.appendChild(box);
+        <button type="button" data-delete-set="${set.id}" class="lm-btn secondary" style="margin-top:10px; padding:6px 10px; font-size:12px;">セット削除</button>
+      </div>
+    `;
+
+    wrap.querySelector('.lm-collapsible-header').addEventListener('click', () => {
+      wrap.classList.toggle('open');
     });
 
-    listEl.querySelectorAll('form[data-add-item]').forEach((form) => {
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const setId = form.dataset.addItem;
-        const input = form.querySelector('input');
-        const name = input.value.trim();
-        if (!name) return;
-        const sets = LM.get(LM.KEYS.BELONGING_SETS, []);
-        const set = sets.find((s) => s.id === setId);
-        if (set) set.items.push({ id: LM.uid(), name });
-        LM.set(LM.KEYS.BELONGING_SETS, sets);
-        render();
-      });
+    wrap.querySelector('form[data-add-item]').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = e.target.querySelector('input');
+      const name = input.value.trim();
+      if (!name) return;
+      const sets = LM.get(LM.KEYS.BELONGING_SETS, []);
+      const s = sets.find((x) => x.id === set.id);
+      if (s) s.items.push({ id: LM.uid(), name });
+      LM.set(LM.KEYS.BELONGING_SETS, sets);
+      render();
+      LM.closeModal();
     });
+
+    return wrap;
   }
 
-  function onListClick(e) {
+  function onGlobalClick(e) {
     const removeKey = e.target.dataset.removeItem;
     const deleteSetId = e.target.dataset.deleteSet;
+    const prev = e.target.dataset.prev;
+    const next = e.target.dataset.next;
+    const listAll = e.target.dataset.listAll;
 
     if (removeKey) {
       const [setId, itemId] = removeKey.split(':');
@@ -84,6 +125,7 @@
       if (set) set.items = set.items.filter((it) => it.id !== itemId);
       LM.set(LM.KEYS.BELONGING_SETS, sets);
       render();
+      LM.closeModal();
     }
 
     if (deleteSetId) {
@@ -93,10 +135,27 @@
 
       const schedules = LM.get(LM.KEYS.SCHEDULES, []);
       schedules.forEach((s) => {
+        if (s.belongingSetIds) s.belongingSetIds = s.belongingSetIds.filter((id) => id !== deleteSetId);
         if (s.belongingSetId === deleteSetId) s.belongingSetId = null;
       });
       LM.set(LM.KEYS.SCHEDULES, schedules);
       render();
+      LM.closeModal();
+    }
+
+    if (prev) {
+      page = Math.max(0, page - 1);
+      render();
+    }
+    if (next) {
+      page = page + 1;
+      render();
+    }
+    if (listAll) {
+      const sets = LM.get(LM.KEYS.BELONGING_SETS, []);
+      const wrap = document.createElement('div');
+      renderPaged(wrap, sets, true);
+      LM.openModal('セット 一覧', wrap);
     }
   }
 
