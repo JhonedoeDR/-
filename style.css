@@ -408,15 +408,15 @@ body {
   cursor: pointer;
   aspect-ratio: 1 / 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
   overflow: hidden;
 }
 
 .lm-card-title {
   font-weight: 500;
-  font-size: 13px;
+  font-size: 15px;
   overflow-wrap: anywhere;
 }
 
