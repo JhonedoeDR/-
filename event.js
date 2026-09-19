@@ -1,4 +1,5 @@
 (function () {
+  const PAGE_SIZE = 2;
   const form = document.getElementById('event-form');
   const fields = {
     name: document.getElementById('f-name'),
@@ -15,8 +16,10 @@
 
   let editingId = null;
   const today = LM.todayStr();
+  const page = { ongoing: 0, ended: 0 };
 
   render();
+  document.addEventListener('click', onGlobalClick);
   LM.renderNav(document.getElementById('nav-container'));
 
   form.addEventListener('submit', (e) => {
@@ -44,12 +47,14 @@
   });
 
   cancelBtn.addEventListener('click', resetForm);
-  [ongoingEl, endedEl].forEach((el) => el.addEventListener('click', onListClick));
 
-  function onListClick(e) {
+  function onGlobalClick(e) {
     const editId = e.target.dataset.edit;
     const deleteId = e.target.dataset.delete;
     const updateId = e.target.dataset.updateCurrent;
+    const prevKind = e.target.dataset.prev;
+    const nextKind = e.target.dataset.next;
+    const listAllKind = e.target.dataset.listAll;
 
     if (editId) startEdit(editId);
 
@@ -69,6 +74,18 @@
       LM.set(LM.KEYS.EVENTS, events);
       render();
     }
+
+    if (prevKind) {
+      page[prevKind] = Math.max(0, page[prevKind] - 1);
+      render();
+    }
+    if (nextKind) {
+      page[nextKind] = page[nextKind] + 1;
+      render();
+    }
+    if (listAllKind) {
+      openListAllModal(listAllKind);
+    }
   }
 
   function startEdit(id) {
@@ -83,6 +100,7 @@
     fields.unit.value = ev.unit || '';
     formTitle.textContent = 'イベントを編集';
     cancelBtn.style.display = 'inline-block';
+    LM.closeModal();
     form.scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -94,57 +112,101 @@
     cancelBtn.style.display = 'none';
   }
 
-  function render() {
-    const events = LM.get(LM.KEYS.EVENTS, []);
-    const ongoing = events.filter((ev) => ev.end >= today);
-    const ended = events.filter((ev) => ev.end < today);
-
-    renderList(ongoingEl, ongoing, '開催中のイベントはありません', true);
-    renderList(endedEl, ended, '終了したイベントはありません', false);
+  function getOngoing() {
+    // 現在進行中(開始済み)のものを先頭、次に開始前のものを開始日順で
+    return LM.get(LM.KEYS.EVENTS, [])
+      .filter((ev) => ev.end >= today)
+      .sort((a, b) => {
+        const aActive = a.start <= today ? 0 : 1;
+        const bActive = b.start <= today ? 0 : 1;
+        if (aActive !== bActive) return aActive - bActive;
+        return a.end.localeCompare(b.end);
+      });
   }
 
-  function renderList(container, events, emptyText, showProgress) {
+  function getEnded() {
+    return LM.get(LM.KEYS.EVENTS, [])
+      .filter((ev) => ev.end < today)
+      .sort((a, b) => b.end.localeCompare(a.end));
+  }
+
+  function render() {
+    renderPaged(ongoingEl, getOngoing(), '開催中のイベントはありません', 'ongoing', true);
+    renderPaged(endedEl, getEnded(), '終了したイベントはありません', 'ended', false);
+  }
+
+  function renderPaged(container, events, emptyText, kind, showProgress) {
+    container.innerHTML = '';
     if (events.length === 0) {
       container.innerHTML = `<p class="lm-empty">${emptyText}</p>`;
       return;
     }
 
-    const sorted = [...events].sort((a, b) => a.end.localeCompare(b.end));
-    container.innerHTML = '';
-    sorted.forEach((ev) => {
-      const box = document.createElement('div');
-      box.style.padding = '10px 0';
-      box.style.borderBottom = '1px solid var(--paper-line)';
+    const totalPages = Math.max(1, Math.ceil(events.length / PAGE_SIZE));
+    if (page[kind] >= totalPages) page[kind] = totalPages - 1;
+    const pageItems = events.slice(page[kind] * PAGE_SIZE, page[kind] * PAGE_SIZE + PAGE_SIZE);
 
-      let progressHtml = '';
-      if (showProgress) {
-        const { remain, remainDays, perDay, rate } = LM.calcEventProgress(ev, today);
-        progressHtml = `
-          <div class="lm-progress-track" style="margin:6px 0;">
-            <div class="lm-progress-fill" style="width:${rate}%"></div>
-          </div>
-          <div class="lm-event-remain">残り${remainDays}日 ・ 残り${remain.toLocaleString()}${escapeHtml(ev.unit)} ・ 1日あたり${perDay.toLocaleString()}${escapeHtml(ev.unit)}必要</div>
-          <div style="display:flex; align-items:center; gap:6px; margin-top:6px;">
-            <input type="number" data-current-input="${ev.id}" value="${ev.current}" style="width:100px; font-family:var(--font-body); font-size:16px; padding:6px 8px; border:1px solid var(--paper-line); border-radius:6px;" />
-            <button type="button" data-update-current="${ev.id}" class="lm-btn secondary" style="padding:6px 10px; font-size:12px;">現在値を更新</button>
-          </div>
-        `;
-      }
+    pageItems.forEach((ev) => container.appendChild(renderEventBox(ev, showProgress)));
 
-      box.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:baseline;">
-          <strong>${escapeHtml(ev.name)}</strong>
-          <span style="font-size:12px; color:var(--text-soft);">${ev.start}〜${ev.end}</span>
+    if (events.length > PAGE_SIZE) {
+      const pager = document.createElement('div');
+      pager.className = 'lm-pager';
+      pager.innerHTML = `
+        <button type="button" data-prev="${kind}" ${page[kind] === 0 ? 'disabled' : ''}>◀</button>
+        <span>${page[kind] + 1}/${totalPages}</span>
+        <button type="button" data-next="${kind}" ${page[kind] >= totalPages - 1 ? 'disabled' : ''}>▶</button>
+      `;
+      container.appendChild(pager);
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'lm-btn secondary lm-list-all-btn';
+      btn.dataset.listAll = kind;
+      btn.textContent = '一覧表示';
+      container.appendChild(btn);
+    }
+  }
+
+  function openListAllModal(kind) {
+    const events = kind === 'ongoing' ? getOngoing() : getEnded();
+    const wrap = document.createElement('div');
+    events.forEach((ev) => wrap.appendChild(renderEventBox(ev, kind === 'ongoing')));
+    LM.openModal(kind === 'ongoing' ? '開催中 一覧' : '終了 一覧', wrap);
+  }
+
+  function renderEventBox(ev, showProgress) {
+    const box = document.createElement('div');
+    box.style.padding = '10px 0';
+    box.style.borderBottom = '1px solid var(--paper-line)';
+
+    let progressHtml = '';
+    if (showProgress) {
+      const { remain, remainDays, perDay, rate } = LM.calcEventProgress(ev, today);
+      progressHtml = `
+        <div class="lm-progress-track" style="margin:6px 0;">
+          <div class="lm-progress-fill" style="width:${rate}%"></div>
         </div>
-        <div style="font-size:13px; color:var(--text-soft); margin:2px 0;">${ev.current.toLocaleString()} / ${ev.target.toLocaleString()}${escapeHtml(ev.unit)}</div>
-        ${progressHtml}
-        <div style="display:flex; gap:6px; margin-top:8px;">
-          <button type="button" data-edit="${ev.id}" class="lm-btn secondary" style="padding:4px 10px; font-size:12px;">編集</button>
-          <button type="button" data-delete="${ev.id}" class="lm-btn secondary" style="padding:4px 10px; font-size:12px;">削除</button>
+        <div class="lm-event-remain">残り${remainDays}日 ・ 残り${remain.toLocaleString()}${escapeHtml(ev.unit)} ・ 1日あたり${perDay.toLocaleString()}${escapeHtml(ev.unit)}必要</div>
+        <div style="display:flex; align-items:center; gap:6px; margin-top:6px;">
+          <input type="number" inputmode="numeric" pattern="[0-9]*" data-current-input="${ev.id}" value="${ev.current}" style="width:100px; font-family:var(--font-body); font-size:16px; padding:6px 8px; border:1px solid var(--paper-line); border-radius:6px;" />
+          <button type="button" data-update-current="${ev.id}" class="lm-btn secondary" style="padding:6px 10px; font-size:12px;">現在値を更新</button>
         </div>
       `;
-      container.appendChild(box);
-    });
+    }
+
+    box.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+        <strong>${escapeHtml(ev.name)}</strong>
+        <span style="font-size:12px; color:var(--text-soft);">${ev.start}〜${ev.end}</span>
+      </div>
+      <div style="font-size:13px; color:var(--text-soft); margin:2px 0;">${ev.current.toLocaleString()} / ${ev.target.toLocaleString()}${escapeHtml(ev.unit)}</div>
+      ${progressHtml}
+      <div style="display:flex; gap:6px; margin-top:8px;">
+        <button type="button" data-edit="${ev.id}" class="lm-btn secondary" style="padding:4px 10px; font-size:12px;">編集</button>
+        <button type="button" data-delete="${ev.id}" class="lm-btn secondary" style="padding:4px 10px; font-size:12px;">削除</button>
+      </div>
+    `;
+    return box;
   }
 
   function escapeHtml(str) {
