@@ -46,15 +46,15 @@
           </div>
           <div class="lm-field">
             <label for="f-travel">移動時間(分)</label>
-            <input id="f-travel" type="number" min="0" value="0" />
+            <input id="f-travel" type="number" inputmode="numeric" pattern="[0-9]*" min="0" value="0" />
           </div>
           <div class="lm-field">
             <label for="f-prep">準備時間(分)</label>
-            <input id="f-prep" type="number" min="0" value="0" />
+            <input id="f-prep" type="number" inputmode="numeric" pattern="[0-9]*" min="0" value="0" />
           </div>
           <div class="lm-field">
             <label for="f-arrive">何分前に到着したいか</label>
-            <input id="f-arrive" type="number" min="0" value="0" />
+            <input id="f-arrive" type="number" inputmode="numeric" pattern="[0-9]*" min="0" value="0" />
           </div>
           <div id="calc-preview" class="lm-empty"></div>
           <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
@@ -67,10 +67,8 @@
         <!-- 3段階目(任意) -->
         <div class="lm-step" data-step="3" style="display:none;">
           <div class="lm-field">
-            <label for="f-belonging">持ちものセット(任意)</label>
-            <select id="f-belonging">
-              <option value="">なし</option>
-            </select>
+            <label>持ちものセット(任意・複数選択可)</label>
+            <div id="f-belonging-list" class="lm-check-list"></div>
           </div>
           <div class="lm-field">
             <label for="f-memo">メモ(任意)</label>
