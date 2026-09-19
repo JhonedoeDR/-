@@ -50,7 +50,7 @@
         </div>
         <ul class="lm-check-list">${itemsHtml || '<li class="lm-empty">まだ持ちものが登録されていません</li>'}</ul>
         <form data-add-item="${set.id}" style="display:flex; gap:8px; margin-top:8px;">
-          <input placeholder="持ちものを追加" style="flex:1; font-family:var(--font-body); font-size:16px; padding:8px 10px; border:1px solid var(--paper-line); border-radius:8px;" required />
+          <input placeholder="持ちものを追加" style="flex:1; min-width:0; font-family:var(--font-body); font-size:16px; padding:8px 10px; border:1px solid var(--paper-line); border-radius:8px;" required />
           <button type="submit" class="lm-btn secondary" style="padding:8px 14px;">追加</button>
         </form>
       `;
