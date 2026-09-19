@@ -10,8 +10,8 @@
   hasContent.belongings = renderBelongings();
   hasContent.task = renderTasks();
   hasContent.shift = renderShift();
-
   reorderSections();
+
   renderNotifyBanner();
   setupBackup();
   LM.renderNav(document.getElementById('nav-container'));
@@ -39,10 +39,12 @@
     const schedules = LM.get(LM.KEYS.SCHEDULES, [])
       .filter((s) => s.date === today)
       .sort((a, b) => a.start.localeCompare(b.start));
+
     if (schedules.length === 0) {
       el.innerHTML = '<p class="lm-empty">今日の予定はありません</p>';
       return false;
     }
+
     el.innerHTML = '';
     schedules.forEach((s) => {
       const row = document.createElement('a');
@@ -70,18 +72,22 @@
   function renderBelongings() {
     const el = document.getElementById('belongings-list');
     const countEl = document.getElementById('belongings-count');
+
     const schedules = LM.get(LM.KEYS.SCHEDULES, []).filter((s) => s.date === today);
     const setIds = [...new Set(schedules.flatMap((s) => s.belongingSetIds || (s.belongingSetId ? [s.belongingSetId] : [])))];
     const allSets = LM.get(LM.KEYS.BELONGING_SETS, []);
     const sets = setIds.map((id) => allSets.find((s) => s.id === id)).filter(Boolean);
+
     if (sets.length === 0) {
       countEl.textContent = '';
       el.innerHTML = '<p class="lm-empty">今日呼び出す持ちものセットはありません</p>';
       return false;
     }
+
     const checks = LM.get(LM.KEYS.DAILY_CHECKS, {});
     const todayCheck = checks[today] || { checkedItemIds: [] };
     const checkedSet = new Set(todayCheck.checkedItemIds);
+
     let totalItems = 0;
     let totalChecked = 0;
     el.innerHTML = '';
@@ -106,6 +112,7 @@
     const checks = LM.get(LM.KEYS.DAILY_CHECKS, {});
     const entry = checks[today] || { checkedItemIds: [] };
     const checkedSet = new Set(entry.checkedItemIds);
+
     const ul = document.createElement('ul');
     ul.className = 'lm-check-list';
     if (set.items.length === 0) {
@@ -121,6 +128,7 @@
         ul.appendChild(li);
       });
     }
+
     ul.addEventListener('change', (e) => {
       const checkbox = e.target;
       if (checkbox.type !== 'checkbox') return;
@@ -136,59 +144,51 @@
       checkbox.closest('li').classList.toggle('done', checkbox.checked);
       renderBelongings();
     });
+
     LM.openModal(set.name, ul);
   }
 
-  /* ---------- 今日のタスク(メインタスクのみ最大3件を表示。他は件数のみ) ---------- */
+  /* ---------- 今日のタスク(メインタスク+ほかの件数) ---------- */
   function renderTasks() {
     const el = document.getElementById('tasks-list');
-    const countEl = document.getElementById('tasks-count');
-    const allTasks = LM.get(LM.KEYS.TASKS, {});
-    const tasks = allTasks[today] || [];
-    if (tasks.length === 0) {
-      countEl.textContent = '';
-      el.innerHTML = '<p class="lm-empty">今日のタスクはありません</p>';
+    const state = LM.getTodoState();
+
+    const mainTasks = LM.TODO_MAIN_IDS.map((id) => ({ id, ...state.dailyTasks[id] })).filter((t) => t.name.trim());
+    const otherIds = LM.TODO_GROUPS.filter((g) => !g.isMain).flatMap((g) => g.ids);
+    const otherCount = otherIds.filter((id) => (state.dailyTasks[id].name || '').trim()).length;
+
+    if (mainTasks.length === 0 && otherCount === 0) {
+      el.innerHTML = '<p class="lm-empty">今日のタスクはまだ登録されていません</p>';
       return false;
     }
-    const doneCount = tasks.filter((t) => t.done).length;
-    countEl.textContent = `${doneCount}/${tasks.length}`;
 
-    // メインタスクが指定されていればそれを、なければ先頭から最大3件を表示
-    let mainTasks = tasks.filter((t) => t.main);
-    mainTasks = (mainTasks.length > 0 ? mainTasks : tasks).slice(0, 3);
-    const otherCount = Math.max(0, tasks.length - mainTasks.length);
-
+    el.innerHTML = '';
     const ul = document.createElement('ul');
     ul.className = 'lm-check-list';
     mainTasks.forEach((t) => {
       const li = document.createElement('li');
-      li.className = 'lm-check-item' + (t.done ? ' done' : '');
+      li.className = 'lm-check-item' + (t.checked ? ' done' : '');
       li.innerHTML = `
-        <input type="checkbox" ${t.done ? 'checked' : ''} data-task-id="${t.id}" />
-        <span style="overflow-wrap:anywhere;">${escapeHtml(t.text)}</span>
+        <input type="checkbox" ${t.checked ? 'checked' : ''} data-todo-id="${t.id}" />
+        <span>${escapeHtml(t.name)}</span>
       `;
       ul.appendChild(li);
     });
-
-    el.innerHTML = '';
     el.appendChild(ul);
+
     if (otherCount > 0) {
-      const more = document.createElement('div');
-      more.className = 'lm-task-more';
-      more.textContent = `他${otherCount}件`;
-      el.appendChild(more);
+      const otherEl = document.createElement('div');
+      otherEl.style.cssText = 'text-align:right; font-size:12px; color:var(--text-soft); margin-top:6px;';
+      otherEl.textContent = `ほか${otherCount}`;
+      el.appendChild(otherEl);
     }
 
     ul.addEventListener('change', (e) => {
       const checkbox = e.target;
       if (checkbox.type !== 'checkbox') return;
-      const taskId = checkbox.dataset.taskId;
-      const allTasks2 = LM.get(LM.KEYS.TASKS, {});
-      const list = allTasks2[today] || [];
-      const task = list.find((t) => t.id === taskId);
-      if (task) task.done = checkbox.checked;
-      allTasks2[today] = list;
-      LM.set(LM.KEYS.TASKS, allTasks2);
+      const id = checkbox.dataset.todoId;
+      const s = LM.getTodoState();
+      LM.toggleTodoCheck(s, id, checkbox.checked);
       hasContent.task = renderTasks();
     });
 
@@ -199,14 +199,17 @@
   function renderShift() {
     const el = document.getElementById('shift-box');
     const shift = LM.get(LM.KEYS.SHIFTS, []).find((s) => s.date === today);
+
     if (!shift) {
       el.innerHTML = '<p class="lm-empty">今日の勤務はありません</p>';
       return false;
     }
+
     const wageSettings = LM.get(LM.KEYS.WAGE_SETTINGS, { hourlyWage: 0, transportFee: 0 });
     const { workMin, pay } = LM.calcShiftPay(shift, wageSettings);
     const h = Math.floor(workMin / 60);
     const m = workMin % 60;
+
     el.innerHTML = `
       <div class="lm-shift-box">
         <span>勤務時間 ${shift.start}〜${shift.end}(休憩${shift.breakMin || 0}分)</span>
@@ -217,22 +220,16 @@
     return true;
   }
 
-  /* ---------- 今日のイベント(開催中を先頭に、タップでイベントページへ) ---------- */
+  /* ---------- 今日のイベント(タップでイベントページへ) ---------- */
   function renderEvents() {
     const el = document.getElementById('events-list');
-    const events = LM.get(LM.KEYS.EVENTS, [])
-      .filter((ev) => ev.end >= today)
-      .sort((a, b) => {
-        // 現在進行中(開始済み)のものを先頭、次に開始前のものを終了日順で
-        const aActive = a.start <= today ? 0 : 1;
-        const bActive = b.start <= today ? 0 : 1;
-        if (aActive !== bActive) return aActive - bActive;
-        return a.end.localeCompare(b.end);
-      });
+    const events = LM.get(LM.KEYS.EVENTS, []).filter((ev) => ev.end >= today);
+
     if (events.length === 0) {
       el.innerHTML = '<p class="lm-empty">開催中のイベントはありません</p>';
       return false;
     }
+
     el.innerHTML = '';
     events.forEach((ev) => {
       const { remain, remainDays, perDay, rate } = LM.calcEventProgress(ev, today);
@@ -299,6 +296,7 @@
         LM.showToast('保存できませんでした', 'error');
       }
     });
+
     document.getElementById('import-input').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
