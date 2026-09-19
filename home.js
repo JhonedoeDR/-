@@ -51,9 +51,18 @@
       const row = document.createElement('a');
       row.className = 'lm-schedule-item';
       row.href = `./schedule.html?id=${encodeURIComponent(s.id)}`;
+
+      const hasCalc = (s.travelMin || 0) + (s.prepMin || 0) + (s.arriveBeforeMin || 0) > 0;
+      const departureHtml = hasCalc
+        ? `<div class="lm-schedule-departure">出発 ${LM.calcDeparture(s).depart}</div>`
+        : '';
+
       row.innerHTML = `
         <span class="lm-schedule-time">${s.start}</span>
-        <span>${escapeHtml(s.name)}</span>
+        <span>
+          <div>${escapeHtml(s.name)}</div>
+          ${departureHtml}
+        </span>
       `;
       el.appendChild(row);
     });
