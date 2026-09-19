@@ -110,6 +110,12 @@ body {
   min-width: 52px;
 }
 
+.lm-schedule-departure {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
 /* ---------- チェックリスト(持ちもの/タスク) ---------- */
 .lm-check-list {
   list-style: none;
