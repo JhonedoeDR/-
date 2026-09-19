@@ -293,3 +293,165 @@ body {
     transition: none !important;
   }
 }
+
+/* ---------- モーダル(レイヤー表示) ---------- */
+.lm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.lm-modal {
+  background: var(--paper);
+  width: 100%;
+  max-width: 480px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 16px 16px 0 0;
+  padding: 16px 20px 28px;
+}
+
+.lm-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-family: var(--font-display);
+  font-size: 16px;
+}
+
+.lm-modal-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-soft);
+  padding: 4px;
+}
+
+/* ---------- トースト通知 ---------- */
+.lm-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--text);
+  color: var(--paper);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1100;
+  max-width: 80vw;
+}
+
+.lm-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.lm-toast.error {
+  background: var(--red);
+}
+
+/* ---------- ページャー(◀ 1/5 ▶) ---------- */
+.lm-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.lm-pager button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--text);
+  padding: 4px 10px;
+}
+
+.lm-pager button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.lm-list-all-btn {
+  display: block;
+  margin: 10px auto 0;
+  font-size: 12px;
+  padding: 6px 14px;
+}
+
+/* ---------- カードグリッド(今日の持ちもの) ---------- */
+.lm-card-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lm-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  padding: 12px 44px 12px 14px;
+  cursor: pointer;
+}
+
+.lm-card-title {
+  font-weight: 500;
+}
+
+.lm-card-count {
+  position: absolute;
+  bottom: 10px;
+  right: 14px;
+  font-size: 12px;
+  color: var(--text-soft);
+}
+
+/* ---------- 折りたたみ ---------- */
+.lm-collapsible {
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.lm-collapsible-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  cursor: pointer;
+  background: #fff;
+}
+
+.lm-collapsible-arrow {
+  display: inline-block;
+  transition: transform 0.15s ease;
+  color: var(--text-soft);
+}
+
+.lm-collapsible.open .lm-collapsible-arrow {
+  transform: rotate(90deg);
+}
+
+.lm-collapsible-body {
+  display: none;
+  padding: 0 14px 14px;
+}
+
+.lm-collapsible.open .lm-collapsible-body {
+  display: block;
+}
