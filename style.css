@@ -229,7 +229,6 @@ body {
   border-color: var(--amber);
 }
 
-
 /* ---------- フォーム共通(今後のページ用) ---------- */
 .lm-field {
   display: flex;
@@ -247,7 +246,7 @@ body {
 .lm-field select,
 .lm-field textarea {
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: 16px;
   padding: 10px 12px;
   border: 1px solid var(--paper-line);
   border-radius: 8px;
