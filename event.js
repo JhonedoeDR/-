@@ -125,7 +125,7 @@
           </div>
           <div class="lm-event-remain">残り${remainDays}日 ・ 残り${remain.toLocaleString()}${escapeHtml(ev.unit)} ・ 1日あたり${perDay.toLocaleString()}${escapeHtml(ev.unit)}必要</div>
           <div style="display:flex; align-items:center; gap:6px; margin-top:6px;">
-            <input type="number" data-current-input="${ev.id}" value="${ev.current}" style="width:100px; font-family:var(--font-body); font-size:14px; padding:6px 8px; border:1px solid var(--paper-line); border-radius:6px;" />
+            <input type="number" data-current-input="${ev.id}" value="${ev.current}" style="width:100px; font-family:var(--font-body); font-size:16px; padding:6px 8px; border:1px solid var(--paper-line); border-radius:6px;" />
             <button type="button" data-update-current="${ev.id}" class="lm-btn secondary" style="padding:6px 10px; font-size:12px;">現在値を更新</button>
           </div>
         `;
