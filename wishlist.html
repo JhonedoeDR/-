@@ -33,15 +33,21 @@
         </div>
         <div class="lm-field">
           <label for="f-price">価格(円)</label>
-          <input id="f-price" type="number" min="0" />
+          <input id="f-price" type="number" inputmode="numeric" pattern="[0-9]*" min="0" />
         </div>
         <div class="lm-field">
           <label for="f-url">販売ページURL</label>
           <input id="f-url" type="url" />
         </div>
         <div class="lm-field">
-          <label for="f-desire">欲しい度(1〜5)</label>
-          <input id="f-desire" type="number" min="1" max="5" value="3" />
+          <label for="f-desire">欲しい度</label>
+          <select id="f-desire">
+            <option value="1">★☆☆☆☆</option>
+            <option value="2">★★☆☆☆</option>
+            <option value="3" selected>★★★☆☆</option>
+            <option value="4">★★★★☆</option>
+            <option value="5">★★★★★</option>
+          </select>
         </div>
         <div class="lm-field" style="flex-direction:row; align-items:center; gap:8px;">
           <input id="f-plan" type="checkbox" style="width:18px; height:18px;" />
