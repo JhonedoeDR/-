@@ -1,4 +1,5 @@
 (function () {
+  const PAGE_SIZE = 3;
   const form = document.getElementById('item-form');
   const fields = {
     name: document.getElementById('f-name'),
@@ -16,8 +17,10 @@
   const totalsEl = document.getElementById('totals');
 
   let editingId = null;
+  const page = { unpurchased: 0, purchased: 0 };
 
   render();
+  document.addEventListener('click', onGlobalClick);
   LM.renderNav(document.getElementById('nav-container'));
 
   form.addEventListener('submit', (e) => {
@@ -49,12 +52,13 @@
 
   cancelBtn.addEventListener('click', resetForm);
 
-  [unpurchasedEl, purchasedEl].forEach((el) => el.addEventListener('click', onListClick));
-
-  function onListClick(e) {
+  function onGlobalClick(e) {
     const editId = e.target.dataset.edit;
     const deleteId = e.target.dataset.delete;
     const toggleId = e.target.dataset.togglePurchased;
+    const prevKind = e.target.dataset.prev;
+    const nextKind = e.target.dataset.next;
+    const listAllKind = e.target.dataset.listAll;
 
     if (editId) startEdit(editId);
 
@@ -70,7 +74,20 @@
       const item = items.find((it) => it.id === toggleId);
       if (item) item.purchased = !item.purchased;
       LM.set(LM.KEYS.WISHLIST, items);
+      LM.closeModal();
       render();
+    }
+
+    if (prevKind) {
+      page[prevKind] = Math.max(0, page[prevKind] - 1);
+      render();
+    }
+    if (nextKind) {
+      page[nextKind] = page[nextKind] + 1;
+      render();
+    }
+    if (listAllKind) {
+      openListAllModal(listAllKind);
     }
   }
 
@@ -87,6 +104,7 @@
     fields.memo.value = item.memo || '';
     formTitle.textContent = '編集';
     cancelBtn.style.display = 'inline-block';
+    LM.closeModal();
     form.scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -100,11 +118,11 @@
 
   function render() {
     const items = LM.get(LM.KEYS.WISHLIST, []);
-    const unpurchased = items.filter((it) => !it.purchased);
-    const purchased = items.filter((it) => it.purchased);
+    const unpurchased = items.filter((it) => !it.purchased).sort((a, b) => b.desire - a.desire);
+    const purchased = items.filter((it) => it.purchased).sort((a, b) => b.desire - a.desire);
 
-    renderList(unpurchasedEl, unpurchased, 'まだ何も登録されていません');
-    renderList(purchasedEl, purchased, '購入済みのものはまだありません');
+    renderPaged(unpurchasedEl, unpurchased, 'まだ何も登録されていません', 'unpurchased');
+    renderPaged(purchasedEl, purchased, '購入済みのものはまだありません', 'purchased');
     renderTotals(unpurchased);
   }
 
@@ -117,37 +135,71 @@
     `;
   }
 
-  function renderList(container, items, emptyText) {
+  function renderPaged(container, items, emptyText, kind) {
+    container.innerHTML = '';
     if (items.length === 0) {
       container.innerHTML = `<p class="lm-empty">${emptyText}</p>`;
       return;
     }
 
-    const sorted = [...items].sort((a, b) => b.desire - a.desire);
-    container.innerHTML = '';
-    sorted.forEach((it) => {
-      const box = document.createElement('div');
-      box.style.padding = '10px 0';
-      box.style.borderBottom = '1px solid var(--paper-line)';
-      box.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:baseline;">
-          <strong>${escapeHtml(it.name)}</strong>
-          <span>¥${it.price.toLocaleString()}</span>
-        </div>
-        <div style="font-size:12px; color:var(--text-soft); margin:2px 0 6px;">
-          ${escapeHtml(it.category)} ・ 欲しい度${it.desire} ${it.planThisMonth ? '・ 今月買う予定' : ''}
-          ${it.url ? ` ・ <a href="${escapeHtml(it.url)}" target="_blank" rel="noopener">販売ページ</a>` : ''}
-        </div>
-        <div style="display:flex; gap:6px;">
-          <button type="button" data-toggle-purchased="${it.id}" class="lm-btn secondary" style="padding:4px 10px; font-size:12px;">
-            ${it.purchased ? '未購入に戻す' : '購入済みにする'}
-          </button>
-          <button type="button" data-edit="${it.id}" class="lm-btn secondary" style="padding:4px 10px; font-size:12px;">編集</button>
-          <button type="button" data-delete="${it.id}" class="lm-btn secondary" style="padding:4px 10px; font-size:12px;">削除</button>
-        </div>
+    const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+    if (page[kind] >= totalPages) page[kind] = totalPages - 1;
+    const pageItems = items.slice(page[kind] * PAGE_SIZE, page[kind] * PAGE_SIZE + PAGE_SIZE);
+
+    pageItems.forEach((it) => container.appendChild(renderItemBox(it)));
+
+    if (items.length > PAGE_SIZE) {
+      const pager = document.createElement('div');
+      pager.className = 'lm-pager';
+      pager.innerHTML = `
+        <button type="button" data-prev="${kind}" ${page[kind] === 0 ? 'disabled' : ''}>◀</button>
+        <span>${page[kind] + 1}/${totalPages}</span>
+        <button type="button" data-next="${kind}" ${page[kind] >= totalPages - 1 ? 'disabled' : ''}>▶</button>
       `;
-      container.appendChild(box);
-    });
+      container.appendChild(pager);
+    }
+
+    if (items.length > PAGE_SIZE) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'lm-btn secondary lm-list-all-btn';
+      btn.dataset.listAll = kind;
+      btn.textContent = '一覧表示';
+      container.appendChild(btn);
+    }
+  }
+
+  function openListAllModal(kind) {
+    const items = LM.get(LM.KEYS.WISHLIST, [])
+      .filter((it) => (kind === 'unpurchased' ? !it.purchased : it.purchased))
+      .sort((a, b) => b.desire - a.desire);
+    const wrap = document.createElement('div');
+    items.forEach((it) => wrap.appendChild(renderItemBox(it)));
+    LM.openModal(kind === 'unpurchased' ? '未購入 一覧' : '購入済み 一覧', wrap);
+  }
+
+  function renderItemBox(it) {
+    const box = document.createElement('div');
+    box.style.padding = '10px 0';
+    box.style.borderBottom = '1px solid var(--paper-line)';
+    box.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+        <strong>${escapeHtml(it.name)}</strong>
+        <span>¥${it.price.toLocaleString()}</span>
+      </div>
+      <div style="font-size:12px; color:var(--text-soft); margin:2px 0 6px;">
+        ${escapeHtml(it.category)} ・ ${'★'.repeat(it.desire)}${'☆'.repeat(5 - it.desire)} ${it.planThisMonth ? '・ 今月買う予定' : ''}
+        ${it.url ? ` ・ <a href="${escapeHtml(it.url)}" target="_blank" rel="noopener">販売ページ</a>` : ''}
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button type="button" data-toggle-purchased="${it.id}" class="lm-btn secondary" style="padding:4px 10px; font-size:12px;">
+          ${it.purchased ? '未購入に戻す' : '購入済みにする'}
+        </button>
+        <button type="button" data-edit="${it.id}" class="lm-btn secondary" style="padding:4px 10px; font-size:12px;">編集</button>
+        <button type="button" data-delete="${it.id}" class="lm-btn secondary" style="padding:4px 10px; font-size:12px;">削除</button>
+      </div>
+    `;
+    return box;
   }
 
   function escapeHtml(str) {
