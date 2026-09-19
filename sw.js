@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lm-cache-v4';
+const CACHE_NAME = 'lm-cache-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const ASSETS = [
   './shift.html',
   './wishlist.html',
   './event.html',
+  './todo.html',
   './style.css',
   './app.js',
   './home.js',
@@ -17,6 +18,7 @@ const ASSETS = [
   './shift.js',
   './wishlist.js',
   './event.js',
+  './todo.js',
   './manifest.json',
 ];
 
