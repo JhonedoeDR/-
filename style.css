@@ -97,6 +97,8 @@ body {
   padding: 6px 0;
   cursor: pointer;
   border-radius: 6px;
+  text-decoration: none;
+  color: var(--ink);
 }
 
 .lm-schedule-item:hover {
