@@ -20,8 +20,8 @@
       <div class="lm-section-title">作業時間の合計</div>
       <div id="work-list"></div>
       <form id="work-form" style="display:flex; gap:8px; margin-top:10px;">
-        <input id="f-work-name" placeholder="作業名(例:風呂)" style="flex:2; font-family:var(--font-body); font-size:14px; padding:8px 10px; border:1px solid var(--paper-line); border-radius:8px;" required />
-        <input id="f-work-min" type="number" min="0" placeholder="分" style="flex:1; font-family:var(--font-body); font-size:14px; padding:8px 10px; border:1px solid var(--paper-line); border-radius:8px;" required />
+        <input id="f-work-name" placeholder="作業名(例:風呂)" style="flex:1; min-width:0; font-family:var(--font-body); font-size:14px; padding:8px 10px; border:1px solid var(--paper-line); border-radius:8px;" required />
+        <input id="f-work-min" type="number" min="0" placeholder="分" style="width:64px; flex:none; font-family:var(--font-body); font-size:14px; padding:8px 6px; border:1px solid var(--paper-line); border-radius:8px;" required />
         <button type="submit" class="lm-btn secondary" style="padding:8px 14px;">追加</button>
       </form>
       <div id="work-total" style="margin-top:12px; font-size:16px; font-weight:700;"></div>
@@ -35,6 +35,10 @@
       </div>
       <div id="reverse-result" class="lm-empty"></div>
     </section>
+
+    <div style="margin-top:8px;">
+      <button type="button" id="reset-all-btn" class="lm-btn secondary">作業時間と終了時刻をリセット</button>
+    </div>
 
     <div id="nav-container"></div>
   </div>
