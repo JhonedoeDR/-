@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
 
 :root {
-  --paper: #faf8f3;
-  --paper-line: #e4ddcd;
-  --ink: #1f2a3d;
-  --ink-soft: #5a6478;
-  --amber: #c6883a;
-  --amber-soft: #f1e0c3;
-  --green: #5c7a5e;
-  --green-soft: #dfe8df;
+  --paper: #ffffff;
+  --paper-line: #e3e8ee;
+  --text: #65aaed;
+  --text-soft: #90c2f2;
+  --accent: #ffded7;
+  --accent-soft: #fff6f4;
+  --teal: #c7e6e8;
+  --teal-soft: #f4fafb;
   --red: #a85c4a;
   --radius: 10px;
   --font-display: 'Shippori Mincho', serif;
@@ -24,7 +24,7 @@ body {
   margin: 0;
   padding: 0;
   background: var(--paper);
-  color: var(--ink);
+  color: var(--text);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
@@ -52,7 +52,7 @@ body {
 }
 
 .lm-sub-header {
-  color: var(--ink-soft);
+  color: var(--text-soft);
   font-size: 13px;
   margin: 0 0 20px;
 }
@@ -80,12 +80,12 @@ body {
 .lm-section-title .lm-count {
   font-family: var(--font-body);
   font-size: 12px;
-  color: var(--ink-soft);
+  color: var(--text-soft);
   font-weight: 400;
 }
 
 .lm-empty {
-  color: var(--ink-soft);
+  color: var(--text-soft);
   font-size: 13px;
   padding: 4px 0;
 }
@@ -98,28 +98,28 @@ body {
   cursor: pointer;
   border-radius: 6px;
   text-decoration: none;
-  color: var(--ink);
+  color: var(--text);
 }
 
 .lm-schedule-item:hover {
-  background: var(--amber-soft);
+  background: var(--accent-soft);
 }
 
 .lm-schedule-time {
   font-variant-numeric: tabular-nums;
-  color: var(--amber);
+  color: var(--accent);
   font-weight: 500;
   min-width: 52px;
 }
 
 .lm-schedule-departure {
   font-size: 12px;
-  color: var(--ink-soft);
+  color: var(--text-soft);
   margin-top: 2px;
 }
 
 .lm-schedule-departure strong {
-  color: var(--amber);
+  color: var(--accent);
   font-weight: 500;
 }
 
@@ -144,12 +144,12 @@ body {
 .lm-check-item input[type='checkbox'] {
   width: 18px;
   height: 18px;
-  accent-color: var(--green);
+  accent-color: var(--teal);
   flex-shrink: 0;
 }
 
 .lm-check-item.done span {
-  color: var(--ink-soft);
+  color: var(--text-soft);
   text-decoration: line-through;
   text-decoration-color: var(--paper-line);
 }
@@ -165,7 +165,7 @@ body {
 .lm-shift-pay {
   font-size: 20px;
   font-weight: 700;
-  color: var(--amber);
+  color: var(--accent);
   margin-top: 4px;
 }
 
@@ -186,20 +186,20 @@ body {
 }
 
 .lm-event-remain {
-  color: var(--ink-soft);
+  color: var(--text-soft);
   font-size: 12px;
 }
 
 .lm-progress-track {
   height: 8px;
   border-radius: 4px;
-  background: var(--green-soft);
+  background: var(--teal-soft);
   overflow: hidden;
 }
 
 .lm-progress-fill {
   height: 100%;
-  background: var(--green);
+  background: var(--teal);
   border-radius: 4px;
 }
 
@@ -218,7 +218,7 @@ body {
   background: #fff;
   border: 1px solid var(--paper-line);
   border-radius: var(--radius);
-  color: var(--ink);
+  color: var(--text);
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
@@ -226,7 +226,7 @@ body {
 }
 
 .lm-nav-btn:active {
-  border-color: var(--amber);
+  border-color: var(--accent);
 }
 
 /* ---------- フォーム共通(今後のページ用) ---------- */
@@ -239,7 +239,7 @@ body {
 
 .lm-field label {
   font-size: 13px;
-  color: var(--ink-soft);
+  color: var(--text-soft);
 }
 
 .lm-field input,
@@ -251,13 +251,13 @@ body {
   border: 1px solid var(--paper-line);
   border-radius: 8px;
   background: #fff;
-  color: var(--ink);
+  color: var(--text);
 }
 
 .lm-field input:focus,
 .lm-field select:focus,
 .lm-field textarea:focus {
-  outline: 2px solid var(--amber);
+  outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
 
@@ -266,7 +266,7 @@ body {
   padding: 12px 18px;
   border-radius: 8px;
   border: none;
-  background: var(--ink);
+  background: var(--text);
   color: var(--paper);
   font-family: var(--font-body);
   font-size: 14px;
@@ -276,14 +276,14 @@ body {
 
 .lm-btn.secondary {
   background: #fff;
-  color: var(--ink);
+  color: var(--text);
   border: 1px solid var(--paper-line);
 }
 
 .lm-back-link {
   display: inline-block;
   margin-bottom: 16px;
-  color: var(--ink-soft);
+  color: var(--text-soft);
   font-size: 13px;
   text-decoration: none;
 }
