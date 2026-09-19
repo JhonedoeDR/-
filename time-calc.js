@@ -1,5 +1,6 @@
 (function () {
   const KEY = 'lm_timeCalcItems';
+  const END_TIME_KEY = 'lm_timeCalcEndTime';
   const workForm = document.getElementById('work-form');
   const nameInput = document.getElementById('f-work-name');
   const minInput = document.getElementById('f-work-min');
@@ -7,7 +8,9 @@
   const totalEl = document.getElementById('work-total');
   const endTimeInput = document.getElementById('f-end-time');
   const reverseResult = document.getElementById('reverse-result');
+  const resetAllBtn = document.getElementById('reset-all-btn');
 
+  endTimeInput.value = LM.get(END_TIME_KEY, '') || '';
   renderWorkList();
   LM.renderNav(document.getElementById('nav-container'));
 
@@ -32,7 +35,18 @@
     renderWorkList();
   });
 
-  endTimeInput.addEventListener('input', updateReverse);
+  endTimeInput.addEventListener('input', () => {
+    LM.set(END_TIME_KEY, endTimeInput.value);
+    updateReverse();
+  });
+
+  resetAllBtn.addEventListener('click', () => {
+    if (!confirm('作業時間の一覧と終了したい時刻をリセットしますか?')) return;
+    LM.set(KEY, []);
+    LM.set(END_TIME_KEY, '');
+    endTimeInput.value = '';
+    renderWorkList();
+  });
 
   function renderWorkList() {
     const items = LM.get(KEY, []);
