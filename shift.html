@@ -16,14 +16,27 @@
     <h1 class="lm-date-header">給与・シフト</h1>
 
     <section class="lm-section" style="border-top:none;">
+      <div class="lm-section-title">
+        今月の集計
+        <span class="lm-count" id="month-label"></span>
+      </div>
+      <div id="month-summary" class="lm-shift-box"></div>
+    </section>
+
+    <section class="lm-section">
+      <div class="lm-section-title">シフト一覧</div>
+      <div id="shift-list"></div>
+    </section>
+
+    <section class="lm-section">
       <div class="lm-section-title">基本設定</div>
       <div class="lm-field">
         <label for="f-wage">時給(円)</label>
-        <input id="f-wage" type="number" min="0" />
+        <input id="f-wage" type="number" inputmode="numeric" pattern="[0-9]*" min="0" />
       </div>
       <div class="lm-field">
         <label for="f-transport">交通費(1勤務あたり・円)</label>
-        <input id="f-transport" type="number" min="0" />
+        <input id="f-transport" type="number" inputmode="numeric" pattern="[0-9]*" min="0" />
       </div>
     </section>
 
@@ -44,24 +57,11 @@
         </div>
         <div class="lm-field">
           <label for="f-break">休憩時間(分)</label>
-          <input id="f-break" type="number" min="0" value="0" />
+          <input id="f-break" type="number" inputmode="numeric" pattern="[0-9]*" min="0" value="0" />
         </div>
         <div id="calc-preview" class="lm-empty"></div>
         <button type="submit" class="lm-btn" style="margin-top:8px;">保存</button>
       </form>
-    </section>
-
-    <section class="lm-section">
-      <div class="lm-section-title">
-        今月の集計
-        <span class="lm-count" id="month-label"></span>
-      </div>
-      <div id="month-summary" class="lm-shift-box"></div>
-    </section>
-
-    <section class="lm-section">
-      <div class="lm-section-title">シフト一覧</div>
-      <div id="shift-list"></div>
     </section>
 
     <div id="nav-container"></div>
