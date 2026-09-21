@@ -259,7 +259,18 @@ LM.defaultTodoState = function () {
     weeklyClears: 0,
     reflected: LM.defaultTodoReflected(),
     weekStartDate: LM.todoMondayKey(),
+    dayKey: LM.todoDayKey(),
   };
+};
+
+// タスクの「1日」の区切りをAM4:00とする(4:00より前は前日扱い)
+LM.todoDayKey = function (d) {
+  d = d || new Date();
+  const shifted = new Date(d.getTime() - 4 * 60 * 60 * 1000);
+  const y = shifted.getFullYear();
+  const m = String(shifted.getMonth() + 1).padStart(2, '0');
+  const day = String(shifted.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 };
 
 LM.getTodoState = function () {
@@ -269,13 +280,24 @@ LM.getTodoState = function () {
   if (typeof state.weeklyClears !== 'number') state.weeklyClears = 0;
   if (!state.reflected) state.reflected = LM.defaultTodoReflected();
   if (!state.weekStartDate) state.weekStartDate = LM.todoMondayKey();
+  if (!state.dayKey) state.dayKey = LM.todoDayKey();
+
   const thisMonday = LM.todoMondayKey();
   if (state.weekStartDate !== thisMonday) {
     state.weekStartDate = thisMonday;
     state.weeklyClears = 0;
     state.reflected = LM.defaultTodoReflected();
-    LM.set(LM.TODO_KEY, state);
   }
+
+  // AM4:00を過ぎたら日付が変わったとみなし、入力・チェックを自動リセット(週間記録は保持)
+  const today = LM.todoDayKey();
+  if (state.dayKey !== today) {
+    state.dayKey = today;
+    state.dailyTasks = LM.defaultTodoTasks();
+    state.reflected = LM.defaultTodoReflected();
+  }
+
+  LM.saveTodoState(state);
   return state;
 };
 
