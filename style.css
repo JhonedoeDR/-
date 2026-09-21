@@ -215,19 +215,25 @@ body {
   display: block;
   text-align: center;
   padding: 14px 6px;
-  background: #fff;
-  border: 1px solid var(--paper-line);
+  background: var(--accent);
+  border: none;
+  border-bottom: 5px solid #d9768e;
   border-radius: var(--radius);
   color: var(--text);
   text-decoration: none;
   font-size: 13px;
-  font-weight: 500;
-  transition: border-color 0.15s ease;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
 }
 
 .lm-nav-btn:active,
 .lm-nav-btn.lm-pressed {
-  border-color: var(--accent);
+  margin-top: 3px;
+  border-bottom: 2px solid #d9768e;
+  background: var(--accent-soft);
 }
 
 /* ---------- フォーム共通(今後のページ用) ---------- */
@@ -538,4 +544,3 @@ body {
 .lm-week-cell.is-filled {
   background: var(--accent);
 }
-
