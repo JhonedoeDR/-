@@ -372,6 +372,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+
 /* ---------- ナビゲーション(共通フッターボタン)描画 ---------- */
 LM.renderNav = function (container) {
   const nav = document.createElement('nav');
