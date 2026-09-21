@@ -401,7 +401,7 @@ LM.renderNav = function (container) {
       setTimeout(() => {
         if (it.external) window.open(a.href, '_blank', 'noopener');
         else location.href = a.href;
-      }, 150);
+      }, 90);
     });
     nav.appendChild(a);
   });
