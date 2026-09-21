@@ -213,31 +213,22 @@ body {
 
 .lm-nav-btn {
   display: block;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.5;
-  position: relative;
-  padding: 14px 6px;
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.15s ease;
   text-align: center;
-  vertical-align: middle;
-  text-decoration: none;
-  letter-spacing: 0.05em;
-  color: var(--text);
+  padding: 14px 6px;
+  background: #fff;
+  border: 1px solid var(--paper-line);
   border-radius: var(--radius);
-  background: var(--accent);
-  border: none;
-  border-bottom: 5px solid #d9768e;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: border-color 0.15s ease;
 }
 
-.lm-nav-btn:active {
-  margin-top: 3px;
-  border-bottom: 2px solid #d9768e;
-  background: var(--accent-soft);
+.lm-nav-btn:active,
+.lm-nav-btn.lm-pressed {
+  border-color: var(--accent);
 }
-
 
 /* ---------- フォーム共通(今後のページ用) ---------- */
 .lm-field {
