@@ -372,7 +372,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-
 /* ---------- ナビゲーション(共通フッターボタン)描画 ---------- */
 LM.renderNav = function (container) {
   const nav = document.createElement('nav');
@@ -396,6 +395,14 @@ LM.renderNav = function (container) {
       a.target = '_blank';
       a.rel = 'noopener';
     }
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      a.classList.add('lm-pressed');
+      setTimeout(() => {
+        if (it.external) window.open(a.href, '_blank', 'noopener');
+        else location.href = a.href;
+      }, 150);
+    });
     nav.appendChild(a);
   });
   container.appendChild(nav);
