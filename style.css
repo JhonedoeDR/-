@@ -221,6 +221,7 @@ body {
   border-radius: var(--radius);
   color: var(--text);
   text-decoration: none;
+  font-family: var(--font-display);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.05em;
