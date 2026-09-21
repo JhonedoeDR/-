@@ -226,7 +226,7 @@ body {
   letter-spacing: 0.05em;
   cursor: pointer;
   user-select: none;
-  transition: all 0.15s ease;
+  transition: all 0.08s ease;
 }
 
 .lm-nav-btn:active,
