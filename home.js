@@ -2,15 +2,17 @@
   const today = LM.todayStr();
   document.getElementById('date-header').textContent = LM.formatDateHeader(today);
 
-  const SECTION_ORDER = ['event', 'schedule', 'belongings', 'task', 'shift'];
+  const SECTION_ORDER = ['event', 'task', 'schedule', 'belongings', 'shift'];
   const hasContent = {};
 
   hasContent.event = renderEvents();
+  hasContent.task = renderTasks();
   hasContent.schedule = renderSchedules();
   hasContent.belongings = renderBelongings();
-  hasContent.task = renderTasks();
   hasContent.shift = renderShift();
   reorderSections();
+
+  setupTaskLink();
 
   renderNotifyBanner();
   setupBackup();
@@ -193,6 +195,16 @@
     });
 
     return true;
+  }
+
+  /* ---------- タスクセクションをタップでタスクページへ ---------- */
+  function setupTaskLink() {
+    const section = document.querySelector('[data-section="task"]');
+    section.style.cursor = 'pointer';
+    section.addEventListener('click', (e) => {
+      if (e.target.tagName === 'INPUT') return;
+      location.href = './todo.html';
+    });
   }
 
   /* ---------- 今日の勤務 ---------- */
