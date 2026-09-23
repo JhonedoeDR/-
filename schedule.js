@@ -201,11 +201,11 @@
     schedules.forEach((s) => {
       const row = document.createElement('div');
       row.className = 'lm-schedule-item';
-      row.style.cursor = 'default';
+      row.style.cursor = 'pointer';
       row.style.justifyContent = 'space-between';
       row.style.alignItems = 'center';
       row.innerHTML = `
-        <span>
+        <span data-confirm="${s.id}" style="flex:1;">
           <span class="lm-schedule-time">${LM.formatDateHeader(s.date).slice(0, -3)} ${s.start}</span>
           <span>${escapeHtml(s.name)}</span>
         </span>
@@ -218,15 +218,47 @@
     });
   }
 
+  function showConfirm(id) {
+    const schedule = LM.get(LM.KEYS.SCHEDULES, []).find((s) => s.id === id);
+    if (!schedule) return;
+    const sets = LM.get(LM.KEYS.BELONGING_SETS, []);
+    const selectedIds = schedule.belongingSetIds || (schedule.belongingSetId ? [schedule.belongingSetId] : []);
+    const belongingNames = selectedIds
+      .map((sid) => sets.find((s) => s.id === sid))
+      .filter(Boolean)
+      .map((s) => s.name);
+    const r = LM.calcDeparture(schedule);
+
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'font-size:14px; line-height:1.9;';
+    wrap.innerHTML = `
+      <div><span style="color:var(--text-soft);">日付</span> ${LM.formatDateHeader(schedule.date)}</div>
+      <div><span style="color:var(--text-soft);">開始時刻</span> ${schedule.start}</div>
+      <div><span style="color:var(--text-soft);">場所</span> ${escapeHtml(schedule.place) || '(未入力)'}</div>
+      <div><span style="color:var(--text-soft);">移動時間</span> ${schedule.travelMin || 0}分</div>
+      <div><span style="color:var(--text-soft);">準備時間</span> ${schedule.prepMin || 0}分</div>
+      <div><span style="color:var(--text-soft);">到着希望</span> ${schedule.arriveBeforeMin || 0}分前</div>
+      <div style="margin:6px 0; padding:8px 10px; background:var(--accent-soft); border-radius:8px;">
+        準備開始 <strong>${r.prepStart}</strong> ・ 出発 <strong>${r.depart}</strong> ・ 到着目安 <strong>${r.arrive}</strong>
+      </div>
+      <div><span style="color:var(--text-soft);">持ちものセット</span> ${belongingNames.length ? escapeHtml(belongingNames.join('、')) : '(なし)'}</div>
+      <div><span style="color:var(--text-soft);">メモ</span> ${schedule.memo ? escapeHtml(schedule.memo) : '(なし)'}</div>
+    `;
+    LM.openModal(schedule.name, wrap);
+  }
+
   function onListClick(e) {
     const editId = e.target.dataset.edit;
     const deleteId = e.target.dataset.delete;
+    const confirmId = e.target.closest('[data-confirm]') ? e.target.closest('[data-confirm]').dataset.confirm : null;
     if (editId) startEdit(editId);
-    if (deleteId) {
+    else if (deleteId) {
       if (!confirm('この予定を削除しますか?')) return;
       const schedules = LM.get(LM.KEYS.SCHEDULES, []).filter((s) => s.id !== deleteId);
       LM.set(LM.KEYS.SCHEDULES, schedules);
       renderList();
+    } else if (confirmId) {
+      showConfirm(confirmId);
     }
   }
 
