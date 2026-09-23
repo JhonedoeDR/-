@@ -231,9 +231,11 @@ LM.TODO_GROUPS = [
 LM.TODO_MAIN_IDS = ['main1', 'main2', 'main3'];
 LM.TODO_WEEK_TOTAL = 14;
 
+// 週の始まり(月曜)をAM4:00basisで算出(4:00より前はまだ前日=前週として扱う)
 LM.todoMondayKey = function (d) {
   d = d || new Date();
-  const date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const shifted = new Date(d.getTime() - 4 * 60 * 60 * 1000);
+  const date = new Date(shifted.getFullYear(), shifted.getMonth(), shifted.getDate());
   const day = date.getDay();
   const diff = day === 0 ? -6 : 1 - day;
   date.setDate(date.getDate() + diff);
@@ -260,6 +262,7 @@ LM.defaultTodoState = function () {
     reflected: LM.defaultTodoReflected(),
     weekStartDate: LM.todoMondayKey(),
     dayKey: LM.todoDayKey(),
+    reward: '',
   };
 };
 
@@ -281,12 +284,14 @@ LM.getTodoState = function () {
   if (!state.reflected) state.reflected = LM.defaultTodoReflected();
   if (!state.weekStartDate) state.weekStartDate = LM.todoMondayKey();
   if (!state.dayKey) state.dayKey = LM.todoDayKey();
+  if (typeof state.reward !== 'string') state.reward = '';
 
   const thisMonday = LM.todoMondayKey();
   if (state.weekStartDate !== thisMonday) {
     state.weekStartDate = thisMonday;
     state.weeklyClears = 0;
     state.reflected = LM.defaultTodoReflected();
+    state.reward = '';
   }
 
   // AM4:00を過ぎたら日付が変わったとみなし、入力・チェックを自動リセット(週間記録は保持)
