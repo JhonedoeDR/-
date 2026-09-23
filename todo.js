@@ -6,6 +6,13 @@
 
   let state = LM.getTodoState();
 
+  const rewardInput = document.getElementById('f-reward');
+  rewardInput.value = state.reward || '';
+  rewardInput.addEventListener('input', () => {
+    state.reward = rewardInput.value;
+    LM.saveTodoState(state);
+  });
+
   renderGroups();
   renderWeeklyGrid();
   LM.renderNav(document.getElementById('nav-container'));
