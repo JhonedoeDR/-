@@ -5,6 +5,7 @@
   const listEl = document.getElementById('set-list');
 
   let page = 0;
+  const openSetIds = new Set();
 
   render();
   document.addEventListener('click', onGlobalClick);
@@ -64,7 +65,7 @@
 
   function renderSetBox(set) {
     const wrap = document.createElement('div');
-    wrap.className = 'lm-collapsible';
+    wrap.className = 'lm-collapsible' + (openSetIds.has(set.id) ? ' open' : '');
 
     const itemsHtml = set.items
       .map(
@@ -93,6 +94,8 @@
 
     wrap.querySelector('.lm-collapsible-header').addEventListener('click', () => {
       wrap.classList.toggle('open');
+      if (wrap.classList.contains('open')) openSetIds.add(set.id);
+      else openSetIds.delete(set.id);
     });
 
     wrap.querySelector('form[data-add-item]').addEventListener('submit', (e) => {
@@ -104,8 +107,8 @@
       const s = sets.find((x) => x.id === set.id);
       if (s) s.items.push({ id: LM.uid(), name });
       LM.set(LM.KEYS.BELONGING_SETS, sets);
+      openSetIds.add(set.id);
       render();
-      LM.closeModal();
     });
 
     return wrap;
