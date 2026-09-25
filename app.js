@@ -310,6 +310,11 @@ LM.saveTodoState = function (state) {
   LM.set(LM.TODO_KEY, state);
 };
 
+// 予定・イベントの変更をFirestoreへ同期する(登録している場合のみ)
+LM.syncFirebase = function () {
+  if (window.LMFirebase) window.LMFirebase.syncData();
+};
+
 // メインタスクを初めてチェックした時だけ週間クリア数を+1する(週をまたぐとリセット)
 LM.toggleTodoCheck = function (state, id, checked) {
   state.dailyTasks[id].checked = checked;
