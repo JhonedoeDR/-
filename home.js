@@ -282,12 +282,25 @@
       el.innerHTML = '<p class="lm-empty">通知がブロックされています(端末の設定から許可できます)</p>';
       return;
     }
-    el.innerHTML = '<button type="button" id="enable-notify" class="lm-btn secondary" style="margin-bottom:8px;">通知を有効にする</button>';
+    el.innerHTML = '<button type="button" id="enable-notify" class="lm-btn secondary" style="margin-bottom:8px;">通知を有効にする(アプリ外通知)</button>';
     document.getElementById('enable-notify').addEventListener('click', async () => {
       const result = await LM.requestNotificationPermission();
       renderNotifyBanner();
-      if (result === 'granted') LM.startNotificationLoop();
+      if (result === 'granted') {
+        LM.startNotificationLoop();
+        if (window.LMFirebase) {
+          window.LMFirebase.registerToken();
+          window.LMFirebase.syncData();
+        }
+      }
     });
+  }
+
+  // データが変わった時にFirestoreへ同期しておく(アプリ外通知の判定に使われる)
+  if (window.LMFirebase) {
+    window.LMFirebase.syncData();
+  } else {
+    window.addEventListener('lm-firebase-ready', () => window.LMFirebase.syncData(), { once: true });
   }
 
   /* ---------- バックアップの保存/復元 ---------- */
