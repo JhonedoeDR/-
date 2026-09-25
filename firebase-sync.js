@@ -3,12 +3,12 @@ import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/fireb
 import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-messaging.js';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyAjcD8w1rMolAw_q3f6n02B2N8JJuhgFB0',
-  authDomain: 'dailytool-3414b.firebaseapp.com',
-  projectId: 'dailytool-3414b',
-  storageBucket: 'dailytool-3414b.firebasestorage.app',
-  messagingSenderId: '832994228236',
-  appId: '1:832994228236:web:374f1ed1ba4a8a394a1629',
+  apiKey: "AIzaSyAjcD8w1rMolAw_q3f6n02B2N8JJuhgFB0",
+  authDomain: "dailytool-3414b.firebaseapp.com",
+  projectId: "dailytool-3414b",
+  storageBucket: "dailytool-3414b.firebasestorage.app",
+  messagingSenderId: "832994228236",
+  appId: "1:832994228236:web:374f1ed1ba4a8a394a1629",
 };
 
 // Firebaseコンソール > プロジェクトの設定 > Cloud Messaging > ウェブ プッシュ証明書 で発行したVAPIDキー
