@@ -275,6 +275,19 @@
     }
     if (Notification.permission === 'granted') {
       LM.startNotificationLoop();
+      if (window.LMFirebase) {
+        window.LMFirebase.registerToken();
+        window.LMFirebase.syncData();
+      } else {
+        window.addEventListener(
+          'lm-firebase-ready',
+          () => {
+            window.LMFirebase.registerToken();
+            window.LMFirebase.syncData();
+          },
+          { once: true }
+        );
+      }
       el.innerHTML = '';
       return;
     }
