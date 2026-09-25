@@ -120,6 +120,7 @@
     }
     const ok = LM.set(LM.KEYS.SCHEDULES, schedules);
     if (!ok) return;
+    LM.syncFirebase();
     resetForm();
     renderList();
   }
@@ -256,6 +257,7 @@
       if (!confirm('この予定を削除しますか?')) return;
       const schedules = LM.get(LM.KEYS.SCHEDULES, []).filter((s) => s.id !== deleteId);
       LM.set(LM.KEYS.SCHEDULES, schedules);
+      LM.syncFirebase();
       renderList();
     } else if (confirmId) {
       showConfirm(confirmId);
