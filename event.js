@@ -42,6 +42,7 @@
       events.push(data);
     }
     LM.set(LM.KEYS.EVENTS, events);
+    LM.syncFirebase();
     resetForm();
     render();
   });
@@ -62,6 +63,7 @@
       if (!confirm('このイベントを削除しますか?')) return;
       const events = LM.get(LM.KEYS.EVENTS, []).filter((ev) => ev.id !== deleteId);
       LM.set(LM.KEYS.EVENTS, events);
+      LM.syncFirebase();
       render();
     }
 
@@ -72,6 +74,7 @@
       const ev = events.find((e2) => e2.id === updateId);
       if (ev) ev.current = Number(input.value) || 0;
       LM.set(LM.KEYS.EVENTS, events);
+      LM.syncFirebase();
       render();
     }
 
