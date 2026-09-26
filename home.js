@@ -266,54 +266,57 @@
     return true;
   }
 
-  /* ---------- 通知の有効化バナー ---------- */
+  /* ---------- 通知の状態表示・登録ボタン ---------- */
   function renderNotifyBanner() {
     const el = document.getElementById('notify-banner');
     if (!('Notification' in window)) {
-      el.innerHTML = '';
-      return;
-    }
-    if (Notification.permission === 'granted') {
-      LM.startNotificationLoop();
-      if (window.LMFirebase) {
-        window.LMFirebase.registerToken();
-        window.LMFirebase.syncData();
-      } else {
-        window.addEventListener(
-          'lm-firebase-ready',
-          () => {
-            window.LMFirebase.registerToken();
-            window.LMFirebase.syncData();
-          },
-          { once: true }
-        );
-      }
-      el.innerHTML = '';
+      el.innerHTML = '<p class="lm-empty">この端末は通知に対応していません</p>';
       return;
     }
     if (Notification.permission === 'denied') {
       el.innerHTML = '<p class="lm-empty">通知がブロックされています(端末の設定から許可できます)</p>';
       return;
     }
+
+    if (Notification.permission === 'granted') {
+      LM.startNotificationLoop();
+      el.innerHTML = `
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
+          <span class="lm-empty" style="margin:0;">通知:有効</span>
+          <button type="button" id="resync-notify" class="lm-btn secondary" style="font-size:12px; padding:6px 12px;">アプリ外通知を登録し直す</button>
+        </div>
+      `;
+      document.getElementById('resync-notify').addEventListener('click', () => registerFirebase(true));
+      return;
+    }
+
     el.innerHTML = '<button type="button" id="enable-notify" class="lm-btn secondary" style="margin-bottom:8px;">通知を有効にする(アプリ外通知)</button>';
     document.getElementById('enable-notify').addEventListener('click', async () => {
       const result = await LM.requestNotificationPermission();
       renderNotifyBanner();
       if (result === 'granted') {
         LM.startNotificationLoop();
-        if (window.LMFirebase) {
-          window.LMFirebase.registerToken();
-          window.LMFirebase.syncData();
-        }
+        registerFirebase(true);
       }
     });
   }
 
-  // データが変わった時にFirestoreへ同期しておく(アプリ外通知の判定に使われる)
-  if (window.LMFirebase) {
-    window.LMFirebase.syncData();
-  } else {
-    window.addEventListener('lm-firebase-ready', () => window.LMFirebase.syncData(), { once: true });
+  // FCMトークン登録+データ同期。showFeedback=trueの時は結果をトーストで表示
+  async function registerFirebase(showFeedback) {
+    if (!window.LMFirebase) {
+      await new Promise((resolve) => window.addEventListener('lm-firebase-ready', resolve, { once: true }));
+    }
+    try {
+      const token = await window.LMFirebase.registerToken();
+      await window.LMFirebase.syncData();
+      if (showFeedback) {
+        if (token) LM.showToast('アプリ外通知を登録しました');
+        else LM.showToast('登録に失敗しました(トークン取得不可)', 'error');
+      }
+    } catch (e) {
+      console.error(e);
+      if (showFeedback) LM.showToast('登録に失敗しました', 'error');
+    }
   }
 
   /* ---------- バックアップの保存/復元 ---------- */
