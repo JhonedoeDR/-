@@ -7,13 +7,18 @@ on:
 
 jobs:
   check:
+    name: Run check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: setup code
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install firebase-admin
-      - run: node scripts/notify-check.js
+      - name: Run install
+        run: npm install firebase-admin
+      - name: Run node
+        run: node scripts/notify-check.js
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
